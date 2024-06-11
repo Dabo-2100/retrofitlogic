@@ -1,0 +1,25 @@
+#Resizer {
+  width: auto;
+  background-color: #00000090;
+  position: fixed;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  top: 0;
+  align-items: center;
+  justify-items: center;
+  height: 100vh;
+  @media print {
+    display: none;
+  }
+
+  .content {
+    width: auto;
+  }
+
+  .icon {
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+}

@@ -1,0 +1,86 @@
+#Form_1001 {
+  width: 1122px;
+  height: 793px;
+  background-color: white;
+  border: 2px solid black;
+  @media print {
+    border: 0 !important;
+  }
+  padding-top: 35px;
+  padding-bottom: 35px;
+  input {
+    outline: 0;
+    text-align: center;
+    border: 2px solid black;
+    border-right-width: 0;
+    border-radius: 0;
+  }
+  textarea {
+    outline: 0;
+    padding: 5px;
+  }
+  .formHeader {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: stretch;
+    padding: 0 2rem;
+    .leftSection {
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 12px;
+      .Row {
+        label {
+          text-align: center;
+          font-weight: 600;
+        }
+      }
+    }
+    .centerSection {
+      h1 {
+        font-size: 24px;
+        text-align: center;
+        font-weight: 700;
+      }
+    }
+    .rightSection {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      justify-items: center;
+      align-content: center;
+      gap: 10px;
+
+      img {
+        height: 40px;
+      }
+      .sheetNo {
+        font-size: 12px;
+        label {
+          text-align: center;
+        }
+      }
+    }
+  }
+  .formBody {
+    padding: 2rem;
+    padding-top: 1rem;
+    table {
+      th,
+      td,
+      tr {
+        padding: 5px 0;
+        text-align: center;
+        border: 2px solid black;
+        font-size: 12px;
+        .afHrs {
+          input {
+            width: calc(100% / 7);
+          }
+        }
+      }
+    }
+  }
+}

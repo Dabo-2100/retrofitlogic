@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+#Warehouse {
+  $mainFont: "DM Sans", sans-serif;
+  $secondFont: "Kanit", sans-serif;
+  $redColor: rgb(202, 31, 39);
+  $blueColor: rgb(0, 5, 28);
+  $blackColor: rgb(42, 40, 51);
+  $dGreyColor: rgb(10, 88, 202);
+  * {
+    // font-family: "Kanit", sans-serif;
+    font-family: $mainFont;
+    font-weight: 400;
+  }
+  background-color: white;
+  nav {
+    ul {
+      background-color: $blueColor;
+      li {
+        cursor: pointer;
+        color: white;
+        padding: 1rem;
+        font-size: 18px;
+        transition: ease 400ms all;
+        &:hover {
+          background-color: $redColor;
+        }
+      }
+      li.active {
+        font-weight: 700;
+        background-color: $redColor;
+      }
+    }
+  }
+
+  .ItemForm {
+    background-color: #e1e1e1;
+    max-width: 800px;
+    padding: 1rem;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    h1 {
+      font-family: $secondFont;
+      margin-bottom: 10px;
+    }
+    .formField {
+      margin-bottom: 1rem;
+      label {
+        margin-bottom: 8px;
+        color: rgb(106, 106, 106);
+      }
+    }
+    input {
+      font-size: 18px;
+    }
+    input.error {
+      background-color: rgb(202 31 39 / 46%);
+      color: white;
+    }
+  }
+}

@@ -1,0 +1,306 @@
+#Aircraft_Forms {
+  background-color: #15232e;
+  padding: 32px !important;
+
+  #filesCounter {
+    display: flex;
+    color: white;
+    padding-bottom: 16px;
+    gap: 8px;
+    font-size: 32px;
+    font-weight: 600;
+    label {
+      color: #737781;
+    }
+  }
+
+  #breadcrumb {
+    color: #737781;
+    gap: 8px;
+    margin-bottom: 1rem;
+    .routingView {
+      .icon {
+        font-size: 24px;
+        background-color: #1f2935;
+        padding: 12px;
+        border-radius: 50%;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: white;
+        cursor: pointer;
+      }
+    }
+
+    .route {
+      cursor: pointer;
+      transition: ease all 400ms;
+      &:hover {
+        color: #e4e5e6;
+      }
+    }
+
+    .active {
+      color: #e4e5e6;
+    }
+  }
+
+  #HomeRoute {
+    color: white;
+    #aircrafts {
+      display: flex;
+      flex-wrap: wrap;
+      h1 {
+        font-size: 24px;
+      }
+      .actions {
+        input {
+          background-color: #1f2935;
+          outline: 0;
+          border: 0;
+          padding: 8px 16px;
+          padding-left: 2rem;
+          color: white;
+          width: 350px;
+          border-radius: 5px;
+        }
+        .newFolderIcon {
+          height: 28px;
+          cursor: pointer;
+        }
+      }
+      .foldersContainer {
+        display: flex;
+        flex-wrap: wrap;
+
+        .folder {
+          display: flex;
+          background-color: #1f2935;
+          border-radius: 10px;
+          width: 155px;
+          height: 130px;
+          flex-direction: column;
+          flex-wrap: wrap;
+          align-content: center;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px 0px #0000006e;
+          transition: ease all 400ms;
+          &:hover {
+            background-color: #2c3a4b;
+          }
+          &:hover p {
+            font-weight: 600;
+          }
+          p {
+            font-size: 18px;
+            transition: ease all 400ms;
+          }
+          img {
+            height: 48px;
+          }
+        }
+
+        .tiles {
+          display: flex;
+          background-color: #1f2935;
+          width: 100%;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-content: center;
+          justify-content: flex-start;
+          align-items: center;
+          gap: 1rem;
+          padding: 8px;
+          border-radius: 10px;
+          cursor: pointer;
+          &:hover {
+            background-color: #2c3a4b;
+          }
+          &:hover p {
+            font-weight: 600;
+          }
+          p {
+            font-size: 18px;
+            transition: ease all 400ms;
+          }
+          img {
+            height: 32px;
+          }
+        }
+      }
+    }
+  }
+
+  #FolderRoute {
+    .formType {
+      color: white;
+
+      input[type="search"] {
+        background-color: #1b2732;
+        border-radius: 5px;
+        outline: 0;
+        border: 0;
+        padding: 10px;
+        color: white;
+        &::placeholder {
+          color: white;
+        }
+      }
+
+      .typeHeader {
+        font-size: 18px;
+      }
+
+      .formsContainer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        .folder {
+          display: flex;
+          background-color: #1f2935;
+          border-radius: 10px;
+          width: 155px;
+          height: 130px;
+          flex-direction: column;
+          flex-wrap: wrap;
+          align-content: center;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px 0px #0000006e;
+          transition: ease all 400ms;
+          &:hover {
+            background-color: #2c3a4b;
+          }
+          &:hover p {
+            font-weight: 600;
+          }
+          p {
+            font-size: 18px;
+            transition: ease all 400ms;
+          }
+          img {
+            height: 48px;
+          }
+        }
+      }
+    }
+  }
+
+  #Form_Modal {
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-wrap: wrap;
+    justify-items: center;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+  }
+
+  .searchInput {
+    background-color: #282a2c;
+    color: white;
+    font-size: 20px;
+    border-radius: 100px;
+    padding: 1rem;
+    input {
+      border: 0;
+      outline: 0;
+      background-color: transparent;
+      color: white;
+      width: 90%;
+    }
+  }
+
+  .Slider {
+    .swiper-pagination-bullet {
+      transform: translate(10px);
+    }
+    .Slide {
+      min-height: 10vh;
+      background-color: #1f2935;
+      box-shadow: 0 4px 10px 0px rgba(0, 0, 0, 0.43);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 1rem;
+      cursor: pointer;
+      padding: 2rem 0;
+      position: relative;
+      transition: ease all 500ms;
+      img {
+        width: 70%;
+        object-fit: cover;
+        transition: ease all 500ms;
+      }
+      &:hover img {
+        // scale: 1.12;
+        transform: translate(0, -8px) scale(1.1);
+        border-radius: 6px;
+        border: 1px solid black;
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      }
+
+      // &:hover p {
+      // }
+      p {
+        margin-top: 1rem;
+        font-size: 20px;
+        transition: ease all 500ms;
+      }
+    }
+  }
+
+  .folderActionsMenu {
+    background-color: #23323e;
+    position: absolute;
+    z-index: 10;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px rgba(128, 128, 128, 0.4);
+    width: 200px;
+    .action {
+      transition: ease 400ms all;
+      cursor: pointer;
+      border-radius: 10px;
+      &:hover {
+        background-color: #2f4354;
+      }
+    }
+  }
+
+  #folderContent {
+    background-color: rgba(0, 0, 0, 0.578);
+    position: absolute;
+    max-height: 50vh;
+    overflow-y: auto;
+    width: 50%;
+    border-radius: 0 0 1rem 1rem;
+    padding: 1rem;
+    z-index: 300;
+    top: 100px;
+    input {
+      color: white;
+      padding: 1rem;
+    }
+    table {
+      tr,
+      th,
+      td {
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+$secondColor: #1b2732;
+#SideMenu {
+  width: 250px;
+  background-color: $secondColor;
+  height: 100%;
+  position: relative;
+  border-right: 2px solid #2b313e;
+  ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    padding-left: 1rem;
+    list-style: none;
+    li {
+      &:hover {
+        color: #fafafa;
+        transform: translate(10px);
+      }
+      color: #a2aac4;
+      padding: 1rem 0;
+      cursor: pointer;
+      display: flex;
+      transition: ease all 400ms;
+      align-items: center;
+      gap: 8px;
+    }
+    li.active {
+      color: #fafafa;
+    }
+  }
+  #downPart {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  #Logout {
+    z-index: 0;
+    display: flex;
+    color: #a2aac4;
+    border-top: solid #2b313e 2px;
+    padding: 1rem;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    align-items: center;
+    cursor: pointer;
+    &:hover {
+      color: #fafafa;
+    }
+  }
+}

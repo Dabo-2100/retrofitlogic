@@ -1,0 +1,154 @@
+#Form_1003 {
+  width: 1122px;
+  height: 793px;
+  background-color: white;
+  border: 2px solid black;
+  @media print {
+    border: 0 !important;
+  }
+  padding-top: 35px;
+  padding-bottom: 35px;
+  .formHeader {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: stretch;
+    padding: 0 2rem;
+    .leftSection {
+      font-size: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: space-between;
+      .aircraftNo {
+        input {
+          width: calc(100% / 5);
+        }
+      }
+      input {
+        text-align: center;
+        padding: 5px 0;
+      }
+      label {
+        text-align: center;
+        border: 2px solid black;
+      }
+      .Row {
+        // border: solid  2px black;
+        label {
+          text-align: center;
+          font-weight: 600;
+        }
+        input {
+          border: 0;
+          outline: 0;
+          text-align: center;
+          padding: 0.5rem;
+          border-left: 2px solid black;
+        }
+        div {
+          border: 2px solid black;
+        }
+      }
+    }
+    .centerSection {
+      h1 {
+        font-size: 24px;
+        text-align: center;
+        font-weight: 700;
+      }
+    }
+    .rightSection {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      justify-items: center;
+      align-content: center;
+      gap: 10px;
+      img {
+        height: 40px;
+      }
+      .sheetNo {
+        font-size: 10px;
+        border: 2px solid black;
+        label {
+          text-align: center;
+        }
+        input {
+          padding: 0.25rem;
+          border: 0;
+          border-left: 2px solid black;
+          text-align: center;
+          outline: 0;
+        }
+      }
+    }
+  }
+  .formBody {
+    padding: 0 2rem;
+    padding-top: 1rem;
+
+    table {
+      border: 2px solid black;
+      th,
+      td {
+        font-size: 13px;
+        padding: 0px;
+        text-align: center;
+        border: 2px solid black;
+        border-top: 0;
+        text-align: center;
+        vertical-align: middle;
+
+        textarea {
+          padding: 8px;
+          resize: none;
+          height: 82px;
+          border-radius: 0;
+          border: 0;
+          outline: 0;
+          &:focus {
+            border-radius: 0;
+          }
+        }
+
+        input {
+          height: 40px;
+          border-radius: 0;
+          font-size: 8px;
+          border: 0;
+          outline: 0;
+          text-align: center;
+          &:focus {
+            border-radius: 0;
+          }
+        }
+      }
+
+      th {
+        font-weight: 700;
+        padding: 0.5rem 0;
+      }
+    }
+  }
+  input {
+    border-radius: 0 !important;
+    border: 2px solid black;
+    outline: 0;
+    &:focus {
+      border-radius: 0 !important;
+      outline: 0;
+    }
+  }
+  .cross {
+    display: none;
+    height: 2px;
+    width: 217px;
+    background-color: #0000009c;
+    transform: rotate(-24deg);
+    position: absolute;
+    left: -10px;
+    top: 42px;
+  }
+}

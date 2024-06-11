@@ -1,0 +1,30 @@
+{
+    "$approval": {
+        "delegate": false,
+        "approve": false,
+        "reject": false,
+        "resubmit": false
+    },
+    "$currency_symbol": "$",
+    "Manpower_no": 1,
+    "$field_states": null,
+    "Created_Time": "2024-03-27T14:30:01+02:00",
+    "Parent_Id": {
+        "name": "4",
+        "id": "6133467000003323935"
+    },
+    "$review_process": null,
+    "$editable": true,
+    "$orchestration": false,
+    "$review": null,
+    "$state": "save",
+    "$process_flow": false,
+    "$in_merge": false,
+    "id": "6133467000003323939",
+    "Department_Name": {
+        "name": "Avionics",
+        "id": "6133467000000483543"
+    },
+    "$approval_state": "approved",
+    "$approved": true
+}

@@ -1,0 +1,125 @@
+#Projects {
+  position: relative;
+  table {
+    th,
+    tr,
+    td {
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+  .listTasks {
+    th,
+    td,
+    tr {
+      background-color: rgb(20, 24, 33) !important;
+    }
+  }
+  #ProjectsList {
+    color: white;
+    overflow-x: hidden;
+    .freeMenu {
+      position: fixed;
+      background-color: rgb(48, 49, 52);
+      border-radius: 8px;
+      color: white;
+      li {
+        cursor: pointer;
+        &:hover {
+          background-color: #3c3d40;
+        }
+        list-style: none;
+      }
+    }
+  }
+
+  #newProjectModal {
+    color: black;
+  }
+
+  .Tasklist {
+    header {
+      color: white;
+      font-size: 1.2rem;
+    }
+    .addNew {
+      color: rgba(212, 212, 212, 0.4);
+      cursor: pointer;
+      &:hover {
+        color: rgb(0, 167, 246);
+      }
+    }
+  }
+
+  #addTaskModal {
+    background-color: rgba(0, 0, 0, 0);
+    justify-content: flex-end;
+    padding: 0;
+    .content {
+      height: 100vh;
+      max-height: 100dvh;
+      width: 40%;
+      border-radius: 0;
+      background-color: rgb(32, 33, 36);
+      .header {
+        background-color: rgb(28, 29, 30);
+        color: white;
+      }
+      input,
+      select,
+      textarea {
+        background-color: transparent !important;
+        &::placeholder {
+          color: rgb(150, 150, 150);
+        }
+        color: white;
+      }
+      select option {
+        background-color: rgb(48, 49, 52);
+        color: white;
+      }
+      label {
+        color: rgb(150, 150, 150);
+        .required {
+          color: red;
+        }
+      }
+    }
+  }
+
+  #addTasklistModal {
+    background-color: rgba(0, 0, 0, 0);
+    justify-content: flex-end;
+    padding: 0;
+    .content {
+      height: 100vh;
+      max-height: 100dvh;
+      width: 40%;
+      border-radius: 0;
+      background-color: rgb(32, 33, 36);
+      .header {
+        background-color: rgb(28, 29, 30);
+        color: white;
+      }
+      input,
+      select,
+      textarea {
+        background-color: transparent !important;
+        &::placeholder {
+          color: rgb(150, 150, 150);
+        }
+        color: white;
+      }
+      select option {
+        background-color: rgb(48, 49, 52);
+        color: white;
+      }
+      label {
+        color: rgb(150, 150, 150);
+        .required {
+          color: red;
+        }
+      }
+    }
+  }
+}

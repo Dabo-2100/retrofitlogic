@@ -1,0 +1,33 @@
+#ActivatePage {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  .authImg {
+    width: 4rem;
+  }
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1rem 2rem;
+    gap: 1rem;
+    border-radius: 8px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    background-color: whitesmoke;
+    justify-content: center;
+    align-items: center;
+    align-content: flex-start;
+    input {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .icon {
+      font-size: 4rem;
+      color: rgb(13 110 253);
+    }
+  }
+}

@@ -1,0 +1,31 @@
+#UserBox {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  padding: 1rem;
+  width: 100%;
+  color: white;
+  img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+  .data {
+    width: calc(100% - 32px);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+    align-items: center;
+    h3 {
+      font-size: 16px;
+    }
+    p {
+      font-size: 12px;
+    }
+  }
+}
