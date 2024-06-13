@@ -15,7 +15,7 @@ export default function ProgressBar(props) {
     closeProgressEditor,
     reloadTasklists,
   } = useContext(ProjectsContext);
-  const step = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+  const step = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const progress = useRef();
   const handleClick = () => {
     props.canEdit ? openProgressEditor(props.task_id) : null;

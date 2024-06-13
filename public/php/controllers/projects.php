@@ -9,8 +9,9 @@ $endpoints += [
     '/api/projects/teams' => 'index_teams',
     '/api/projects/\d+/tasklists' => 'index_tasklists',
     '/api/projects/\d+/tasklists/\d+/tasks' => 'index_tasks',
+    '/api/tasklists/\d+/tasks' => 'index_tasks',
+    '/api/tasklists/istemplate' => 'index_templates',
     '/api/tasks/store' => 'store_task',
-
     '/api/sb_tasks' => 'index_sbtasks',
 ];
 
@@ -192,6 +193,7 @@ function index_tasks($id)
                         if ($statement->rowCount() > 0) {
                             while ($el = $statement->fetch(PDO::FETCH_ASSOC)) {
                                 $el['tasklist_status_name'] = getOneField("project_status", "status_name", "status_id = " . $el['task_status_id']);
+                                $el['tasklist_status_color'] = getOneField("project_status", "status_color_code", "status_id = " . $el['task_status_id']);
                                 array_push($data, $el);
                             }
                             $response['err'] = false;
@@ -369,5 +371,53 @@ function getProjectProgress($project_id)
         return $projectProgress;
     } catch (Exception $e) {
         echo $e->getMessage();
+    }
+}
+
+
+
+function index_templates()
+{
+    global $pdo, $response, $method;
+    if ($method === "GET") {
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $headerParts = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+            if (count($headerParts) == 2 && $headerParts[0] == 'Bearer') {
+                $accessToken = $headerParts[1];
+                $user_info = json_decode(checkToken($accessToken), true);
+                if ($user_info) {
+                    try {
+                        $sql = "SELECT * FROM project_tasklists WHERE is_template = 1 ORDER BY tasklist_name";
+                        $statement = $pdo->prepare($sql);
+                        $statement->execute();
+                        $data = [];
+
+                        if ($statement->rowCount() > 0) {
+                            while ($el = $statement->fetch(PDO::FETCH_ASSOC)) {
+                                array_push($data, $el);
+                            }
+                            $response['err'] = false;
+                            $response['msg'] = "All Tasklists are ready to view !";
+                            $response['data'] = $data;
+                        } else {
+                            $response['msg'] = "There are no Tasklists found !";
+                        }
+                    } catch (Exception $e) {
+                        $response['msg'] = "An error occurred: " . $e->getMessage();
+                    }
+                } else {
+                    $response['msg'] = "Invaild user token !";
+                }
+                echo json_encode($response, true);
+            } else {
+                http_response_code(400);
+                echo "Error : 400 | Bad Request";
+            }
+        } else {
+            http_response_code(401); // Unauthorized
+            echo "Error : 401 | Unauthorized";
+        }
+    } else {
+        echo 'Method Not Allowed';
     }
 }

@@ -48,7 +48,7 @@ export default function ProjectDetails() {
     <div className="col-12">
       <div className="col-12 d-flex flex-wrap gap-1 p-3">
         <div className="col-12 pb-3 d-flex justify-content-between align-items-between">
-          <div className="d-flex gap-3" style={{ color: "white" }}>
+          <div className="d-flex gap-3 align-items-center" style={{ color: "white" }}>
             <FontAwesomeIcon icon={faHouse} />
             <FontAwesomeIcon icon={faAngleRight} />
             <p className="m-0">{project_name}</p>
