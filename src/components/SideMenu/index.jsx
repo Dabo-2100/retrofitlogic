@@ -33,15 +33,25 @@ export default function SideMenu() {
         sessionStorage.clear();
         navigate("/login");
       }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    setActiveApps(user_info.user_apps.map((app) => { return app['app_id'] }));
+    console.log(user_info);
+    setActiveApps(
+      user_info.user_apps.map((app) => {
+        return app["app_id"];
+      })
+    );
+    setActiveTab(user_info.user_apps[0].app_id);
   }, []);
 
   return (
-    <div id="SideMenu" className="animate__animated animate__fadeInLeft" style={{ animationDuration: "600ms" }}>
+    <div
+      id="SideMenu"
+      className="animate__animated animate__fadeInLeft"
+      style={{ animationDuration: "600ms" }}
+    >
       <div
         style={{ borderBottom: "solid #2b313e 2px" }}
         className="d-flex flex-row justify-content-center align-items-center col-12"
@@ -49,36 +59,39 @@ export default function SideMenu() {
         <img className="py-0" src={Logo} width={103} style={{ scale: 1.2 }} />
       </div>
       <ul>
-        {
-          tabs.map((tab, index) => {
-            if (activeApps.indexOf(tab.id) != -1) {
-              return (
-                <li
-                  key={tab.id}
-                  onClick={() => {
-                    openTab(tab.id);
-                  }}
-                  className={`animate__animated animate__fadeInUp ${activeTab == tab.id ? "active" : null}`}
-                  style={{ animationDelay: `${400 + (index * 150)}ms` }}
-                >
-                  <FontAwesomeIcon icon={tab.icon} />
-                  <p>{tab.name}</p>
-                </li>
-              );
-            }
-          })}
+        {tabs.map((tab, index) => {
+          if (activeApps.indexOf(tab.id) != -1) {
+            return (
+              <li
+                key={tab.id}
+                onClick={() => {
+                  openTab(tab.id);
+                }}
+                className={`animate__animated animate__fadeInUp ${
+                  activeTab == tab.id ? "active" : null
+                }`}
+                style={{ animationDelay: `${400 + index * 150}ms` }}
+              >
+                <FontAwesomeIcon icon={tab.icon} />
+                <p>{tab.name}</p>
+              </li>
+            );
+          }
+        })}
       </ul>
       <div className="col-12" id="downPart">
-        <UserBox name="Dabo" role="admin" />
-        <div className="col-12" id="Logout" onClick={() => {
-          Logout();
-        }}>
+        <UserBox name={user_info.user_name} role="admin" />
+        <div
+          className="col-12"
+          id="Logout"
+          onClick={() => {
+            Logout();
+          }}
+        >
           <FontAwesomeIcon icon={faPowerOff} />
           <p>Logout</p>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
-
-

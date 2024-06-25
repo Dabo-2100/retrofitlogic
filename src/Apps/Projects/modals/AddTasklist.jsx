@@ -15,6 +15,8 @@ export default function AddTasklist() {
   const [fromTemplateIndex, setFromTemplateIndex] = useState(true);
   const [allTemplates, setAllTemplates] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
+  
+
   const selectList = useRef();
 
   async function submitTasks(tasks, startDate, tasklist_id) {
@@ -154,6 +156,8 @@ export default function AddTasklist() {
       console.log(error);
     }
   };
+
+
 
   useEffect(() => {
     getAllTemplates();

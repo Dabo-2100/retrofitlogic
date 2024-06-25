@@ -23,17 +23,25 @@ export default function ProgressBar(props) {
 
   const app_status = useProjectStatus();
   const updateProgress = () => {
-    let taskStatus = app_status.find((el) => {
-      if (progress.current.value < 100) {
-        return el.status_name == "Open";
-      } else {
-        return el.status_name == "Done";
-      }
-    });
+    let current_status_id = props.status_id;
+    let doneStatus_id = app_status.find((el) => {
+      return el.status_name == "Done";
+    }).status_id;
+    let openStatus_id = app_status.find((el) => {
+      return el.status_name == "Open";
+    }).status_id;
+    let final_id = current_status_id;
+
+    if (current_status_id == doneStatus_id && progress.current.value < 100) {
+      final_id = openStatus_id;
+    }
+    if (progress.current.value == 100) {
+      final_id = doneStatus_id;
+    }
     closeProgressEditor();
     let data = {
       task_progress: progress.current.value,
-      task_status_id: taskStatus.status_id,
+      task_status_id: final_id,
     };
     axios
       .post(

@@ -88,7 +88,7 @@ export default function ProjectsList() {
   };
 
   const cloneProject = () => {
-    alert(`you want to clone ${project_id}`);
+    window.open(`/report/1/${project_id}`, "_blank").focus();
   };
 
   useEffect(() => {
@@ -106,9 +106,9 @@ export default function ProjectsList() {
           <li className="d-flex gap-2 p-2" onClick={() => openSlide(2)}>
             <FontAwesomeIcon icon={faArrowUpRightFromSquare} /> Access Project
           </li>
-          <li className="d-flex gap-2 p-2" onClick={() => openSlide(3)}>
+          {/* <li className="d-flex gap-2 p-2" onClick={() => openSlide(3)}>
             <FontAwesomeIcon icon={faPenToSquare} /> Edit Project
-          </li>
+          </li> */}
           <li
             className="d-flex gap-2 p-2"
             onClick={trashProject}
@@ -118,16 +118,16 @@ export default function ProjectsList() {
           </li>
           <li className="d-flex gap-2 p-2" onClick={cloneProject}>
             <FontAwesomeIcon icon={faClone} />
-            Clone Project
+            Reports
           </li>
         </ul>
       ) : null}
       <header className="col-12 d-flex justify-content-between">
         <h1 className="header">All Projects</h1>
         <div className="actions">
-          <button className="btn btn-success" onClick={() => openModal(1)}>
+          {/* <button className="btn btn-success" onClick={() => openModal(1)}>
             New Project
-          </button>
+          </button> */}
         </div>
       </header>
       <table className="col-12 table table-bordered table-dark table-hover">

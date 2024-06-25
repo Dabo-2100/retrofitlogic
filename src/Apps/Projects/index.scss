@@ -1,4 +1,10 @@
 #Projects {
+  .sticky-top {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* Make sure it appears above other content */
+  }
   position: relative;
   table {
     th,

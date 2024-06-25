@@ -6,6 +6,7 @@ import { useRecoilState } from "recoil";
 import { $LoaderIndex } from "./store";
 import { Api } from "./pages/Api";
 import ActivatePage from "./pages/ActivePage";
+import ReportsPage from "./pages/ReportsPage";
 export default function App() {
   const [loaderIndex] = useRecoilState($LoaderIndex);
   // setLoaderIndex(3);
@@ -19,6 +20,10 @@ export default function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="activate" element={<ActivatePage />} />
             <Route path="api" element={<Api />} />
+            <Route
+              path="report/:reportNo/:projectID"
+              element={<ReportsPage />}
+            />
             <Route path="*" element={"Page 404"} />
           </Route>
         </Routes>

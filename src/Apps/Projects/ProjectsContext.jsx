@@ -9,12 +9,24 @@ const MenuProvider = ({ children }) => {
   const openMenu = () => {
     setMenuIndex(true);
   };
+
   const closeMenu = () => {
     setMenuIndex(false);
   };
 
+  const [filter, setFilter] = useState({
+    index: false,
+    data: {
+      dep: 0,
+      status: 0,
+      tasklist: 0,
+    },
+  });
+
   const [project_id, setProject_id] = useState();
   const [project_name, setProject_name] = useState();
+
+  const [task_id, setTask_id] = useState();
 
   const [list_id, setTasklist_id] = useState();
 
@@ -75,6 +87,10 @@ const MenuProvider = ({ children }) => {
         editProgress,
         openProgressEditor,
         closeProgressEditor,
+        filter,
+        setFilter,
+        task_id,
+        setTask_id,
       }}
     >
       {children}

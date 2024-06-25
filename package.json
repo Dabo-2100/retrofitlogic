@@ -20,7 +20,7 @@
     "apexcharts": "^3.46.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
-    "chart.js": "^4.4.1",
+    "chart.js": "^4.4.3",
     "gantt-task-react": "^0.3.9",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
