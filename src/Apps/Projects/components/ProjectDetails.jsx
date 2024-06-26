@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useProjectStatus } from "./customHooks";
 import { ProjectsContext } from "../ProjectsContext";
 import { useRecoilState } from "recoil";
@@ -8,8 +8,8 @@ import Tasklist from "./Tasklist";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAngleRight,
-  faFilter,
   faHouse,
+  faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProjectDetails() {
@@ -24,6 +24,7 @@ export default function ProjectDetails() {
     setFilter,
     filter,
   } = useContext(ProjectsContext);
+
   const [allTasklists, setAllTasklists] = useState([]);
   const [view, setView] = useState([]);
 
@@ -78,9 +79,43 @@ export default function ProjectDetails() {
     }
   };
   const allStatus = useProjectStatus();
+
+  const pageView = useRef();
+
+  const handlePrint = () => {
+    // console.log(resTable.current.outerHTML);
+    // var newWin = window.open('', 'Print-Window');
+    var newWin = window.open("");
+    newWin.document.open();
+    newWin.document.write("<html><head><title>Print Report</title>");
+    newWin.document.write(`
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+            <style>
+            table,tr,td,th{
+              background-color : white !important;
+              color : black !important;
+              text-align : center;
+              vertical-align : middle;
+            }
+              
+            *[print='false']{
+              display :none;
+            }
+
+            </style>
+        `);
+    newWin.document.write(
+      '</head><body class="p-5" onload="window.print();window.close()">'
+    );
+    newWin.document.write(pageView.current.outerHTML);
+    newWin.document.write("</body></html>");
+    // newWin.document.close();
+  };
+
   useEffect(() => {
     getProjectTaskLists();
   }, [reloadTasklistsIndex]);
+
   return (
     <div className="col-12">
       <div className="col-12 d-flex flex-wrap gap-1 p-3">
@@ -94,7 +129,11 @@ export default function ProjectDetails() {
             <p className="m-0">{project_name}</p>
           </div>
           <div className="d-flex text-white align-items-center gap-3">
-            <FontAwesomeIcon icon={faFilter} className="fs-4" />
+            <FontAwesomeIcon
+              icon={faPrint}
+              className="fs-4"
+              onClick={handlePrint}
+            />
             <button className="btn btn-success" onClick={() => openModal(3)}>
               New Tasklist
             </button>
@@ -155,39 +194,48 @@ export default function ProjectDetails() {
               }}
             />
           </div>
-          <button className="btn btn-danger">Reset</button>
         </div>
-        <table className="table col-12 table-dark table-bordered mb-0">
-          <thead>
-            <tr>
-              <td style={{ width: "4%" }}>-</td>
-              <td style={{ width: "26%" }}>Task name</td>
-              <td style={{ width: "20%" }}>% Progress</td>
-              <td style={{ width: "15%" }}>Start date</td>
-              <td style={{ width: "15%" }}>End date</td>
-              <td style={{ width: "10%" }}>Duration</td>
-              <td style={{ width: "10%" }}>Status</td>
-            </tr>
-          </thead>
-        </table>
-        {view.map((tasklist) => {
-          return (
-            <div
-              key={tasklist.tasklist_id}
-              className="col-12 tasklistRow d-flex flex-wrap gap-0"
-            >
-              <Tasklist
-                id={tasklist.tasklist_id}
-                name={tasklist.tasklist_name}
-                progress={tasklist.tasklist_progress.toFixed(2)}
-                startDate={tasklist.tasklist_start_date}
-                endDate={tasklist.tasklist_end_date}
-                duration={tasklist.tasklist_duration}
-                status={tasklist.tasklist_status_name}
-              />
-            </div>
-          );
-        })}
+        <div className="col-12 d-flex flex-wrap" ref={pageView}>
+          <table className="table col-12 table-dark table-bordered mb-0">
+            <thead>
+              <tr>
+                <td style={{ width: "4%" }} print='false'>-</td>
+                <td style={{ width: "26%" }}>Task name</td>
+                <td style={{ width: "20%" }} print="false">
+                  % Progress
+                </td>
+                <td style={{ width: "15%" }} print="false">
+                  Start date
+                </td>
+                <td style={{ width: "15%" }} print="false">
+                  End date
+                </td>
+                <td style={{ width: "10%" }} print="false">
+                  Duration
+                </td>
+                <td style={{ width: "10%" }}>Status</td>
+              </tr>
+            </thead>
+          </table>
+          {view.map((tasklist) => {
+            return (
+              <div
+                key={tasklist.tasklist_id}
+                className="col-12 tasklistRow d-flex flex-wrap gap-0"
+              >
+                <Tasklist
+                  id={tasklist.tasklist_id}
+                  name={tasklist.tasklist_name}
+                  progress={tasklist.tasklist_progress.toFixed(2)}
+                  startDate={tasklist.tasklist_start_date}
+                  endDate={tasklist.tasklist_end_date}
+                  duration={tasklist.tasklist_duration}
+                  status={tasklist.tasklist_status_name}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

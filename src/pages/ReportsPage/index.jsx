@@ -72,6 +72,8 @@ export default function ReportsPage() {
     datasets: [{ label: "Dataset 1", data: [200, 300, 400, 1000] }],
   });
 
+  const [finalPercentage, setFinalPercentage] = useState();
+
   const groupBySbNo = (data) => {
     return data.reduce((acc, curr) => {
       (acc[curr.sb_no] = acc[curr.sb_no] || []).push(curr);
@@ -137,14 +139,27 @@ export default function ReportsPage() {
         });
 
         let finalLabels = [];
+        let totalDuration = 0;
+
         finalArr.forEach((el) => {
+          totalDuration += +el.total_duration;
           finalLabels.push(el.sb_name);
         });
+
+        console.log(`Aircraft Total is : ${totalDuration}`);
+
         let finalData = [];
+        let totalPercent = 0;
         finalArr.forEach((el) => {
+          let x = isNaN(+el.sb_done_percentage / 100)
+            ? 0
+            : +el.sb_done_percentage / 100;
+          let y = +el.total_duration;
+          totalPercent += (x * y) / +totalDuration;
           finalData.push(el.sb_done_percentage);
         });
-
+        let f = (totalPercent * 100).toFixed(2);
+        setFinalPercentage(f);
         let obj = {
           labels: finalLabels,
           datasets: [
@@ -160,8 +175,6 @@ export default function ReportsPage() {
   };
   useEffect(() => {
     getReportData();
-    let due = getDueDate("2024-06-25 10:15:00", 0.25);
-    console.log(due);
   }, []);
   return (
     <div className="col-12 d-flex justify-content-center" id="Report">
@@ -169,6 +182,9 @@ export default function ReportsPage() {
         <h1 className="col-12 text-center report-header">
           Aircraft : 49064 Progress Report
         </h1>
+        <h5 className="col-12 text-center widget text-white">
+          Full Aircraft Percentage : {finalPercentage} %
+        </h5>
         {/* <p className="col-8 text-center report-desc">
           This report provides a detailed breakdown of the marketing budget,
           showcasing how resources are allocated across various channels and

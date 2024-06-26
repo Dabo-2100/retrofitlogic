@@ -172,6 +172,7 @@ export default function Tasklist(props) {
     selectedTasks.forEach((id) => {
       updateStatus(id, newvale);
     });
+    selectedTasks([]);
   };
 
   const toggleSelectedTask = (task_id) => {
@@ -219,6 +220,7 @@ export default function Tasklist(props) {
             <tbody>
               <tr style={{ backgroundColor: "#252628" }}>
                 <th
+                  print="false"
                   style={{ width: "4%" }}
                   onClick={() => {
                     setCollapseIndex(!collapseIndex);
@@ -250,14 +252,20 @@ export default function Tasklist(props) {
                     {props.progress ? Math.trunc(props.progress) : 0} %
                   </span>
                 </th>
-                <th style={{ width: "15%" }}>{props.startDate}</th>
-                <th style={{ width: "15%" }}>{props.endDate}</th>
+                <th style={{ width: "15%" }} print="false">
+                  {props.startDate}
+                </th>
+                <th style={{ width: "15%" }} print="false">
+                  {props.endDate}
+                </th>
                 {/* <th style={{ width: "15%" }}>-</th> */}
-                <th style={{ width: "10%" }}>
+                <th style={{ width: "10%" }} print="false">
                   {Math.ceil(props.duration)} Hrs
                 </th>
                 {/* <th style={{ width: "10%" }}>{props.status}</th> */}
-                <th style={{ width: "10%" }}>-</th>
+                <th style={{ width: "10%" }} print="false">
+                  -
+                </th>
               </tr>
             </tbody>
           </table>
@@ -267,7 +275,7 @@ export default function Tasklist(props) {
                 {tasks.map((task, index) => {
                   return (
                     <tr key={task.task_id}>
-                      <td style={{ width: "4%" }}>
+                      <td style={{ width: "4%" }} print="false">
                         <input
                           className="form-check-input"
                           type="checkbox"
@@ -288,7 +296,7 @@ export default function Tasklist(props) {
                         {task.task_name}
                       </td>
                       <td style={{ width: "16%" }}>{task.task_desc}</td>
-                      <td style={{ width: "20%" }}>
+                      <td style={{ width: "20%" }} print="false">
                         {
                           <ProgressBar
                             status_id={task.task_status_id}
@@ -301,6 +309,7 @@ export default function Tasklist(props) {
                         }
                       </td>
                       <td
+                        print="false"
                         style={{ width: "15%" }}
                         onDoubleClick={() => setDateIndex(index)}
                       >
@@ -312,21 +321,26 @@ export default function Tasklist(props) {
                           />
                         ) : (
                           <p className="m-0 p-0">
-                            {task.task_start_date.split(" ")[0]} <br />
-                            {task.task_start_date.split(" ")[1]}
+                            {task.task_start_date}
+                            {/* {task.task_start_date.split(" ")[1]} */}
                             {/* {task.task_start_date.split(" ")[0]} <br />
                             {task.task_start_date.split(" ")[1]} */}
                           </p>
                         )}
                       </td>
-                      <td style={{ width: "15%" }}>{task.task_end_date}</td>
-                      <td style={{ width: "10%" }}>{task.task_duration} hrs</td>
+                      <td print="false" style={{ width: "15%" }}>
+                        {task.task_end_date}
+                      </td>
+                      <td print="false" style={{ width: "10%" }}>
+                        {task.task_duration} hrs
+                      </td>
                       <td
                         className="m-0 p-0"
                         style={{ width: "10%" }}
                         onDoubleClick={() => setEditIndex(index)}
                       >
                         <div
+                          print="false"
                           className="col-12 p-2"
                           style={{
                             backgroundColor: `${task.tasklist_status_color}`,
@@ -362,7 +376,7 @@ export default function Tasklist(props) {
                     </tr>
                   );
                 })}
-                <tr>
+                {/* <tr>
                   <td></td>
                   <td>
                     <div className="col-12 d-flex gap-2 justify-content-center">
@@ -380,7 +394,7 @@ export default function Tasklist(props) {
                   <td></td>
                   <td></td>
                   <td></td>
-                </tr>
+                </tr> */}
               </tbody>
             </table>
           ) : null}
