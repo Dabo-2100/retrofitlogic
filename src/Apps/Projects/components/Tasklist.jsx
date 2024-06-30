@@ -1,9 +1,13 @@
 import {
   faChevronDown,
   faChevronRight,
+  faComment,
+  faDownLeftAndUpRightToCenter,
+  faPaperPlane,
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { $Token, $Server, $LoaderIndex } from "@/store";
 import { ProjectsContext } from "../ProjectsContext";
@@ -13,7 +17,11 @@ import { getDueDate, useProjectStatus } from "./customHooks";
 import Swal from "sweetalert2";
 
 export default function Tasklist(props) {
+  const tasklist = useRef();
   const {
+    setTask_id,
+    taskListContext: contextIndex,
+    setTaskListContext: setContextIndex,
     project_id,
     openModal,
     setTasklist_id,
@@ -30,6 +38,7 @@ export default function Tasklist(props) {
   const [collapseIndex, setCollapseIndex] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [dateIndex, setDateIndex] = useState(null);
+
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
 
@@ -167,27 +176,54 @@ export default function Tasklist(props) {
     }
   };
 
-  const handleMultiChange = () => {
-    let newvale = event.target.value;
-    selectedTasks.forEach((id) => {
-      updateStatus(id, newvale);
+  const unSelectAll = () => {
+    let obj = tasklist.current;
+    let inputs = obj.querySelectorAll("input:checked");
+    inputs.forEach((input) => {
+      input.checked = false;
     });
-    selectedTasks([]);
+  };
+  const handleMultiChange = () => {
+    let newValue = event.target.value;
+    let updatePromises = selectedTasks.map((id) => updateStatus(id, newValue));
+    Promise.all(updatePromises)
+      .then(() => {
+        setSelectedTasks([]);
+        reloadTasklists();
+        unSelectAll();
+      })
+      .catch((error) => {
+        console.error("Error updating tasks:", error);
+      });
   };
 
   const toggleSelectedTask = (task_id) => {
     // selectedTasks
     let tasks = [...selectedTasks];
+
     let index = selectedTasks.findIndex((el) => {
       return el == task_id;
     });
-    if (index == -1) {
+
+    if (event.target.checked == true) {
       tasks.push(task_id);
     } else {
       tasks.splice(index, 1);
     }
     setSelectedTasks(tasks);
-    console.log(tasks);
+    // console.log(tasks);
+  };
+
+  const handleRightClick = (task_id) => {
+    setTask_id(task_id);
+    console.log(`Task id : ${task_id}`);
+    event.preventDefault();
+    setContextIndex({
+      index: true,
+      x: event.clientX,
+      y: event.clientY,
+    });
+    // alert(props.id);
   };
 
   useEffect(() => {
@@ -197,11 +233,18 @@ export default function Tasklist(props) {
   return (
     <>
       {tasks.length != 0 ? (
-        <div className={`col-12 Tasklist d-flex flex-wrap ${props.type}`}>
+        <div
+          className={`col-12 Tasklist d-flex flex-wrap ${props.type}`}
+          ref={tasklist}
+        >
           {selectedTasks.length != 0 ? (
             <div className="col-12 d-flex gap-3 align-items-center text-white bg-danger p-3 sticky-top ">
               <label className="text-center col-3">Change Tasks Status</label>
-              <select className="form-select" onChange={handleMultiChange}>
+              <select
+                className="form-select"
+                onChange={handleMultiChange}
+                defaultValue={0}
+              >
                 <option value={0} hidden disabled>
                   Task Status
                 </option>
@@ -213,6 +256,34 @@ export default function Tasklist(props) {
                   );
                 })}
               </select>
+            </div>
+          ) : null}
+
+          {contextIndex.index ? (
+            <div
+              id="taskActions"
+              className="bg-dark d-flex flex-column gap-1 p-2 text-white rounded"
+              style={{
+                left: contextIndex.x,
+                top: contextIndex.y,
+                position: "fixed",
+              }}
+            >
+              <div
+                className="col-12 d-flex align-item-center gap-3 p-2"
+                onClick={() => openModal(5)}
+              >
+                <FontAwesomeIcon icon={faComment} />
+                <p>Add Comment</p>
+              </div>
+              <div className="col-12 d-flex align-item-center gap-3 p-2">
+                <FontAwesomeIcon icon={faPenToSquare} />
+                <p>Rename Task</p>
+              </div>
+              <div className="col-12 d-flex align-item-center gap-3 p-2">
+                <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
+                <p>Move Task</p>
+              </div>
             </div>
           ) : null}
 
@@ -270,13 +341,20 @@ export default function Tasklist(props) {
             </tbody>
           </table>
           {collapseIndex ? (
-            <table className="col-12 table table-bordered table-dark mb-0 listTasks">
+            <table
+              // onContextMenu={(event) => event.stopPropagation()}
+              className="col-12 table table-bordered table-dark mb-0 listTasks"
+            >
               <tbody>
                 {tasks.map((task, index) => {
                   return (
-                    <tr key={task.task_id}>
+                    <tr
+                      key={task.task_id}
+                      onContextMenu={() => handleRightClick(task.task_id)}
+                    >
                       <td style={{ width: "4%" }} print="false">
                         <input
+                          style={{ cursor: "pointer", scale: "1.2" }}
                           className="form-check-input"
                           type="checkbox"
                           onClick={() => toggleSelectedTask(task.task_id)}
@@ -293,10 +371,21 @@ export default function Tasklist(props) {
                           }`,
                         }}
                       >
-                        {task.task_name}
+                        <div className="col-12 d-flex gap-3 justify-content-center">
+                          <p>{task.task_name}</p>
+                          {task.comment_count ? (
+                            <FontAwesomeIcon
+                              icon={faComment}
+                              onClick={() => {
+                                setTask_id(task.task_id);
+                                openModal(5);
+                              }}
+                            />
+                          ) : null}
+                        </div>
                       </td>
                       <td style={{ width: "16%" }}>{task.task_desc}</td>
-                      <td style={{ width: "20%" }} print="false">
+                      <td style={{ width: "20%" }} print="true">
                         {
                           <ProgressBar
                             status_id={task.task_status_id}
@@ -340,7 +429,7 @@ export default function Tasklist(props) {
                         onDoubleClick={() => setEditIndex(index)}
                       >
                         <div
-                          print="false"
+                          print="true"
                           className="col-12 p-2"
                           style={{
                             backgroundColor: `${task.tasklist_status_color}`,

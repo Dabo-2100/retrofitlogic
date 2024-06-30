@@ -16,6 +16,7 @@ export default function ProjectDetails() {
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const {
+    setTaskListContext,
     project_id,
     reloadTasklists,
     reloadTasklistsIndex,
@@ -117,7 +118,12 @@ export default function ProjectDetails() {
   }, [reloadTasklistsIndex]);
 
   return (
-    <div className="col-12">
+    <div
+      className="col-12"
+      onClick={() => {
+        setTaskListContext({ index: 0, x: 0, y: 0 });
+      }}
+    >
       <div className="col-12 d-flex flex-wrap gap-1 p-3">
         <div className="col-12 pb-3 d-flex justify-content-between align-items-between">
           <div
@@ -199,7 +205,9 @@ export default function ProjectDetails() {
           <table className="table col-12 table-dark table-bordered mb-0">
             <thead>
               <tr>
-                <td style={{ width: "4%" }} print='false'>-</td>
+                <td style={{ width: "4%" }} print="false">
+                  -
+                </td>
                 <td style={{ width: "26%" }}>Task name</td>
                 <td style={{ width: "20%" }} print="false">
                   % Progress

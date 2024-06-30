@@ -63,9 +63,17 @@ const MenuProvider = ({ children }) => {
     });
   };
 
+  const [taskListContext, setTaskListContext] = useState({
+    index: false,
+    x: 0,
+    y: 0,
+  });
+
   return (
     <ProjectsContext.Provider
       value={{
+        taskListContext,
+        setTaskListContext,
         menuIndex,
         openMenu,
         closeMenu,

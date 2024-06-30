@@ -1,21 +1,21 @@
 #Report {
   @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
   background-color: #190f39;
-  height: 100dvh;
+  height: 100vh;
   overflow-y: auto;
-  padding: 78px 80px;
+
   * {
     font-family: "DM Sans", sans-serif !important;
   }
+
   .report-header {
-    font-size: 34px;
     font-weight: 700;
-    margin-bottom: 26px;
   }
   .report-desc {
     font-size: 12px;
     line-height: 1.4;
   }
+
   .widget {
     background: rgb(42, 35, 90);
     background: linear-gradient(
@@ -23,7 +23,18 @@
       rgba(42, 35, 90, 1) 0%,
       rgba(21, 13, 43, 1) 100%
     );
-    padding: 20px 34px;
+    padding: 1rem;
     border-radius: 10px;
+  }
+  #chart {
+    position: sticky;
+    top: 0;
+
+    @media screen and (max-width: 767px) {
+      position: static;
+    }
+    @media screen and (min-width: 767px) {
+      border-left: 10px solid #190f39;
+    }
   }
 }

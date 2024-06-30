@@ -10,6 +10,7 @@ import AddTask from "./modals/AddTask";
 import AddTasklist from "./modals/AddTasklist";
 import TaskDetails from "./modals/TaskDetails";
 import ProjectReports from "./components/ProjectReports";
+import TaskComments from "./modals/TaskComments";
 export default function Projects() {
   const { closeMenu, slideNo, modalNo } = useContext(ProjectsContext);
   return (
@@ -27,6 +28,7 @@ export default function Projects() {
       {modalNo == 2 ? <AddTask /> : null}
       {modalNo == 3 ? <AddTasklist /> : null}
       {modalNo == 4 ? <TaskDetails /> : null}
+      {modalNo == 5 ? <TaskComments /> : null}
     </div>
   );
 }

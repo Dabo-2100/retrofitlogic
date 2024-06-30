@@ -5,6 +5,14 @@
     top: 0;
     z-index: 1020; /* Make sure it appears above other content */
   }
+  #taskActions {
+    div {
+      cursor: pointer;
+      &:hover {
+        background-color: #3c3d40;
+      }
+    }
+  }
   position: relative;
   table {
     th,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./index.scss";
 import axios from "axios";
 import { useRecoilState } from "recoil";
@@ -14,9 +14,20 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { getDueDate } from "../../Apps/Projects/components/customHooks";
+
+import { Chart as ChartJS2, ArcElement } from "chart.js";
+import { Pie } from "react-chartjs-2";
+import ProgressBar from "@/Apps/Projects/components/ProgressBar";
 
 export default function ReportsPage() {
+  const setRandomColor = () => {
+    return (
+      "#" +
+      Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")
+    );
+  };
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -25,6 +36,20 @@ export default function ReportsPage() {
     Tooltip,
     Legend
   );
+  ChartJS2.register(ArcElement, Tooltip, Legend);
+
+  const [chart2, setChart2] = useState({
+    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+    datasets: [
+      {
+        label: "SB % : ",
+        data: [12, 19, 3, 5, 2, 3],
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1,
+      },
+    ],
+  });
 
   const options = {
     responsive: true,
@@ -67,6 +92,8 @@ export default function ReportsPage() {
   const [Server_Url] = useRecoilState($Server);
   const params = useParams();
   const [reportData, setReportData] = useState([]);
+  const [modalIndex, setModalIndex] = useState();
+
   const [chart1_data, setChart1_data] = useState({
     labels: ["jan", "feb"],
     datasets: [{ label: "Dataset 1", data: [200, 300, 400, 1000] }],
@@ -137,7 +164,7 @@ export default function ReportsPage() {
 
           return 0;
         });
-
+        console.log(finalArr);
         let finalLabels = [];
         let totalDuration = 0;
 
@@ -173,25 +200,194 @@ export default function ReportsPage() {
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    if (modalIndex !== undefined) {
+      let parts = reportData[modalIndex]["row_data"];
+      let obj = {
+        labels: parts.map((item) => item.sb_part_name),
+        datasets: [
+          {
+            label: "SB %  ",
+            data: parts.map((item) => {
+              return (
+                (+item.total_duration /
+                  +reportData[modalIndex]["total_duration"]) *
+                100
+              ).toFixed(2);
+            }),
+            backgroundColor: parts.map(() => {
+              return setRandomColor();
+            }),
+            borderColor: [],
+            borderWidth: 1,
+          },
+        ],
+      };
+      setChart2(obj);
+    }
+  }, [modalIndex]);
   useEffect(() => {
     getReportData();
   }, []);
   return (
-    <div className="col-12 d-flex justify-content-center" id="Report">
-      <div className="reportPage container text-white col-12 d-flex flex-column align-items-center">
-        <h1 className="col-12 text-center report-header">
-          Aircraft : 49064 Progress Report
+    <div
+      className="col-12 d-flex justify-content-center align-items-start py-3 py-md-5"
+      id="Report"
+    >
+      <div className="reportPage container text-white col-12 d-flex flex-column align-items-start">
+        {modalIndex !== undefined ? (
+          <div
+            className="col-12 Modal d-flex px-5 px-md-0 align-items-start pt-3"
+            onClick={() => setModalIndex(undefined)}
+          >
+            <div
+              className="col-12 col-md-8 bg-white rounded text-dark p-3 d-flex flex-wrap"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h5 className="col-12 text-start mb-0 bg-dark text-white p-2">
+                SB No : {reportData[modalIndex]["sb_name"]}
+              </h5>
+              <div className="col-12 d-flex" style={{ overflowX: "auto" }}>
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th className="col-4 bg-secondary text-white">
+                        Service Bulliten No
+                      </th>
+                      <td className="col-8" colSpan={2}>
+                        {reportData[modalIndex]["sb_name"]}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th className="bg-secondary text-white">
+                        Estimated Duration
+                      </th>
+                      <td colSpan={2}>
+                        {reportData[modalIndex]["total_duration"]} Hrs
+                      </td>
+                    </tr>
+                    <tr>
+                      <th className="bg-secondary text-white">SB Progress %</th>
+                      <td colSpan={2}>
+                        {/* <ProgressBar canEdit={false} progress={reportData[modalIndex]["sb_done_percentage"]}/> */}
+                        <b>{reportData[modalIndex]["sb_done_percentage"]} %</b>
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th className="col-4 bg-dark text-white py-2">
+                        Part Name
+                      </th>
+                      <th className="col-4 bg-dark text-white py-2">
+                        Structure %
+                      </th>
+                      <th className="col-4 bg-dark text-white py-2">
+                        Avionics %
+                      </th>
+                    </tr>
+                    {reportData[modalIndex]["row_data"].map((part, index) => {
+                      return (
+                        <React.Fragment key={index}>
+                          <tr>
+                            <td rowSpan={2} className="bg-secondary text-white">
+                              {part.sb_part_name}
+                              <br />
+                              {part.total_duration.toFixed(2)} Hrs
+                            </td>
+                            <td>
+                              {part.structure_duration.toFixed(2) == 0 ? (
+                                "-"
+                              ) : (
+                                <p>
+                                  {part.structure_duration.toFixed(2)} Hrs
+                                  <sup
+                                    style={{ color: "#585858b3" }}
+                                    className="ps-1"
+                                  >
+                                    {(
+                                      (part.structure_duration /
+                                        part.total_duration) *
+                                      100
+                                    ).toFixed(2)}
+                                    %
+                                  </sup>
+                                </p>
+                              )}
+                            </td>
+                            <td>
+                              {part.avionics_duration.toFixed(2) == 0 ? (
+                                "-"
+                              ) : (
+                                <p>
+                                  {part.avionics_duration.toFixed(2)} Hrs
+                                  <sup
+                                    style={{ color: "#585858b3" }}
+                                    className="ps-1"
+                                  >
+                                    {(
+                                      (part.avionics_duration /
+                                        part.total_duration) *
+                                      100
+                                    ).toFixed(2)}
+                                    %
+                                  </sup>
+                                </p>
+                              )}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="bg-success text-white">
+                              {(
+                                (+part.done_duration_s /
+                                  +part.structure_duration) *
+                                100
+                              ).toFixed(2)}
+                              %
+                            </th>
+                            <th className="bg-success text-white">
+                              {(
+                                (+part.done_duration_a /
+                                  +part.avionics_duration) *
+                                100
+                              ).toFixed(2)}
+                              %
+                            </th>
+                          </tr>
+                        </React.Fragment>
+                      );
+                    })}
+
+                    <tr>
+                      <th className="bg-dark text-white">Applicable Parts</th>
+                      <th colSpan={2}>
+                        <Pie
+                          data={chart2}
+                          options={{ maintainAspectRatio: false }}
+                          width={200}
+                          height={200}
+                        />
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <h1 className="col-12 text-center mb-3 fs-4 report-header">
+          Aircraft Progress Report
         </h1>
         <h5 className="col-12 text-center widget text-white">
           Full Aircraft Percentage : {finalPercentage} %
         </h5>
-        {/* <p className="col-8 text-center report-desc">
-          This report provides a detailed breakdown of the marketing budget,
-          showcasing how resources are allocated across various channels and
-          campaigns.
-        </p> */}
-        <div className="col-12 d-flex gap-4 report-body">
-          <div className="col-3 widget">
+        <div
+          style={{ position: "relative" }}
+          className="col-12 d-flex flex-wrap gap-3 gap-md-0 align-items-start flex-md-nowrap report-body"
+        >
+          <div className="col-12 col-md-3 d-flex order-2 order-md-1 widget">
             <table className="table table-bordered table-dark text-center table-hover">
               <thead>
                 <tr>
@@ -203,7 +399,7 @@ export default function ReportsPage() {
               <tbody>
                 {reportData.map((sb, index) => {
                   return (
-                    <tr key={index}>
+                    <tr key={index} onClick={() => setModalIndex(index)}>
                       {/* <td>{index + 1}</td> */}
                       <td>{sb.sb_name}</td>
                       <td>
@@ -217,23 +413,11 @@ export default function ReportsPage() {
               </tbody>
             </table>
           </div>
-          <div className="col-9 widget" style={{ position: "relative" }}>
-            <div
-              className="col-12 widget"
-              style={{
-                border: "1px solid grey",
-                boxShadow: "1px 1px 1px grey",
-                padding: "1rem",
-                top: 0,
-                position: "sticky",
-              }}
-            >
-              <Bar
-                style={{ height: "90vh" }}
-                options={options}
-                data={chart1_data}
-              />
-            </div>
+          <div
+            id="chart"
+            className="col-12 col-md-9 d-flex order-1 order-md-2 col-md-9 widget"
+          >
+            <Bar options={options} data={chart1_data} />
           </div>
         </div>
       </div>
