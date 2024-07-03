@@ -3,7 +3,7 @@ import "./index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRecoilState } from "recoil";
 import { $ActiveHomeTab, $HomeTabs, $Token, $User_Info } from "../../store";
-import { faPowerOff } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo-Light.png";
@@ -16,6 +16,8 @@ export default function SideMenu() {
   const [user_info, setUserInfo] = useRecoilState($User_Info);
   const [activeTab, setActiveTab] = useRecoilState($ActiveHomeTab);
   const [activeApps, setActiveApps] = useState([]);
+
+  const [isPhone, setIsPhone] = useState(false);
 
   const openTab = (id) => {
     setActiveTab(id);
@@ -37,7 +39,7 @@ export default function SideMenu() {
   };
 
   useEffect(() => {
-    console.log(user_info);
+    // console.log(user_info);
     setActiveApps(
       user_info.user_apps.map((app) => {
         return app["app_id"];
@@ -54,9 +56,15 @@ export default function SideMenu() {
     >
       <div
         style={{ borderBottom: "solid #2b313e 2px" }}
-        className="d-flex flex-row justify-content-center align-items-center col-12"
+        className="d-flex flex-row justify-content-between px-4 align-items-center col-12"
       >
-        <img className="py-0" src={Logo} width={103} style={{ scale: 1.2 }} />
+        <img
+          className="py-0 logo"
+          src={Logo}
+          width={103}
+          style={{ scale: 1.2 }}
+        />
+        <FontAwesomeIcon icon={faBars} className="fs-3 text-white" />
       </div>
       <ul>
         {tabs.map((tab, index) => {
@@ -72,7 +80,7 @@ export default function SideMenu() {
                 }`}
                 style={{ animationDelay: `${400 + index * 150}ms` }}
               >
-                <FontAwesomeIcon icon={tab.icon} />
+                <FontAwesomeIcon className="icon" icon={tab.icon} />
                 <p>{tab.name}</p>
               </li>
             );

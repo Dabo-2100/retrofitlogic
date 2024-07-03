@@ -1,6 +1,8 @@
 $secondColor: #1b2732;
+
 #SideMenu {
   width: 250px;
+  transition: ease all 400ms;
   background-color: $secondColor;
   height: 100%;
   position: relative;
@@ -55,4 +57,22 @@ $secondColor: #1b2732;
       color: #fafafa;
     }
   }
+}
+
+#SideMenu.small {
+  // background-color: red;
+  .logo {
+    display: none;
+  }
+  width: 50px;
+  li {
+    .icon {
+      font-size: 1.5rem;
+    }
+    p {
+      display: none;
+    }
+  }
+  // @media screen and (max-width: 767px) {
+  // }
 }

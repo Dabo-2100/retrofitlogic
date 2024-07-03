@@ -1,3 +1,5 @@
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   faChevronDown,
   faChevronRight,
@@ -183,6 +185,7 @@ export default function Tasklist(props) {
       input.checked = false;
     });
   };
+
   const handleMultiChange = () => {
     let newValue = event.target.value;
     let updatePromises = selectedTasks.map((id) => updateStatus(id, newValue));
@@ -216,7 +219,7 @@ export default function Tasklist(props) {
 
   const handleRightClick = (task_id) => {
     setTask_id(task_id);
-    console.log(`Task id : ${task_id}`);
+    // console.log(`Task id : ${task_id}`);
     event.preventDefault();
     setContextIndex({
       index: true,
@@ -224,6 +227,39 @@ export default function Tasklist(props) {
       y: event.clientY,
     });
     // alert(props.id);
+  };
+
+  const updateActualTime = async (task_id, oldVal) => {
+    let newVal = event.target.value;
+    if (+oldVal != +newVal) {
+      let data = {
+        actual_duration: +newVal,
+      };
+      // event.target.disabled = true;
+      let res = await axios.post(
+        `${Server_Url}/php/index.php/api/update`,
+        {
+          table_name: "project_tasks",
+          data: data,
+          condition: `task_id = ${task_id}`,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res.data);
+      Swal.fire({
+        text: "Actual Time Updated",
+        timer: 800,
+        position: "top-right",
+        width: "200",
+        showConfirmButton: false,
+        showDenyButton: false,
+      });
+      reloadTasklists();
+    }
   };
 
   useEffect(() => {
@@ -237,6 +273,7 @@ export default function Tasklist(props) {
           className={`col-12 Tasklist d-flex flex-wrap ${props.type}`}
           ref={tasklist}
         >
+          <ToastContainer />
           {selectedTasks.length != 0 ? (
             <div className="col-12 d-flex gap-3 align-items-center text-white bg-danger p-3 sticky-top ">
               <label className="text-center col-3">Change Tasks Status</label>
@@ -267,6 +304,7 @@ export default function Tasklist(props) {
                 left: contextIndex.x,
                 top: contextIndex.y,
                 position: "fixed",
+                zIndex: 1000,
               }}
             >
               <div
@@ -418,7 +456,28 @@ export default function Tasklist(props) {
                         )}
                       </td>
                       <td print="false" style={{ width: "15%" }}>
-                        {task.task_end_date}
+                        <div className="col-12 d-flex gap-3 align-items-center">
+                          <input
+                            type="number"
+                            defaultValue={task.actual_duration}
+                            onContextMenu={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              // event.target.disabled = false;
+                              event.target.focus();
+                            }}
+                            placeholder="Actual"
+                            className="form-control"
+                            onBlur={() =>
+                              updateActualTime(
+                                task.task_id,
+                                task.actual_duration
+                              )
+                            }
+                          />
+                          <p className="mb-0">hrs</p>
+                        </div>
+                        {/* {task.task_end_date} */}
                       </td>
                       <td print="false" style={{ width: "10%" }}>
                         {task.task_duration} hrs

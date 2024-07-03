@@ -7,11 +7,19 @@ import { $LoaderIndex } from "./store";
 import { Api } from "./pages/Api";
 import ActivatePage from "./pages/ActivePage";
 import ReportsPage from "./pages/ReportsPage";
+import { useEffect, useState } from "react";
+import ItalyPage from "./pages/ItalyPage";
 export default function App() {
+  const [innerH, setInnerH] = useState(window.innerHeight);
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      setInnerH(window.innerHeight);
+    });
+  }, []);
   const [loaderIndex] = useRecoilState($LoaderIndex);
   // setLoaderIndex(3);
   return (
-    <div className="col-12 App">
+    <div className="col-12 App" style={{ height: innerH }}>
       {loaderIndex == 1 ? <Loader /> : null}
       <BrowserRouter>
         <Routes>
@@ -20,6 +28,7 @@ export default function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="activate" element={<ActivatePage />} />
             <Route path="api" element={<Api />} />
+            <Route path="kpi/:aircraft_sn" element={<ItalyPage />}></Route>
             <Route
               path="report/:reportNo/:projectID"
               element={<ReportsPage />}

@@ -15,12 +15,11 @@ export default function AddTasklist() {
   const [fromTemplateIndex, setFromTemplateIndex] = useState(true);
   const [allTemplates, setAllTemplates] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
-  
 
   const selectList = useRef();
 
   async function submitTasks(tasks, startDate, tasklist_id) {
-    let sDate = startDate;
+    let sDate = startDate + "T08:00";
     for (let index = 0; index < tasks.length; index++) {
       let task = tasks[index];
       let order = index + 1;
@@ -157,8 +156,6 @@ export default function AddTasklist() {
     }
   };
 
-
-
   useEffect(() => {
     getAllTemplates();
   }, []);
@@ -169,7 +166,7 @@ export default function AddTasklist() {
         className="content p-3 d-flex flex-wrap align-items-start align-content-start animate__animated animate__fadeInRight"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="col-12 header py-2 px-5">Add new tasklist</h3>
+        <h3 className="col-12 header p-2 mb-3">Add new SB Part</h3>
         <datalist id="allTemplates">
           {allTemplates.map((list, index) => {
             return (
@@ -184,7 +181,6 @@ export default function AddTasklist() {
 
         {fromTemplateIndex ? (
           <div className="col-12">
-            <h1>use template</h1>
             <input
               onChange={handleChange}
               ref={selectList}
@@ -209,7 +205,7 @@ export default function AddTasklist() {
                       <td>
                         <input
                           className="form-control"
-                          type="datetime-local"
+                          type="date"
                           ref={startDateInput}
                         />
                       </td>

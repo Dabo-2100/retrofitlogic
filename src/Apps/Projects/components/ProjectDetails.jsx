@@ -141,7 +141,7 @@ export default function ProjectDetails() {
               onClick={handlePrint}
             />
             <button className="btn btn-success" onClick={() => openModal(3)}>
-              New Tasklist
+              New SB Part
             </button>
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function ProjectDetails() {
                   Start date
                 </td>
                 <td style={{ width: "15%" }} print="false">
-                  End date
+                  Actual Duration
                 </td>
                 <td style={{ width: "10%" }} print="false">
                   Duration

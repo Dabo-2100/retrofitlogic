@@ -14,8 +14,8 @@ import {
 
 export const $Server = atom({
   key: "$Server",
-  // default: "",
-  default: "http://localhost/retrofit/public",
+  default: "",
+  // default: "http://localhost/retrofit/public",
 });
 
 export const $Token = atom({

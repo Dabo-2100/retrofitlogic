@@ -11,7 +11,8 @@ export default function TaskComments() {
   const [token] = useRecoilState($Token);
   const [userInfo] = useRecoilState($User_Info);
   const [reloadIndex, setReloadIndex] = useState(0);
-  const { task_id, closeModal, setTask_id } = useContext(ProjectsContext);
+  const { task_id, closeModal, setTask_id, reloadTasklists } =
+    useContext(ProjectsContext);
   const [taskComments, setTaskComments] = useState([]);
   const newComment = useRef();
 
@@ -58,6 +59,7 @@ export default function TaskComments() {
         );
         newComment.current.value = "";
         setReloadIndex(reloadIndex + 1);
+        reloadTasklists();
       } catch (error) {
         console.error(`Error submitting task ${order}:`, error);
       }

@@ -20,6 +20,7 @@ import { Pie } from "react-chartjs-2";
 import ProgressBar from "@/Apps/Projects/components/ProgressBar";
 
 export default function ReportsPage() {
+  
   const setRandomColor = () => {
     return (
       "#" +
@@ -28,6 +29,7 @@ export default function ReportsPage() {
         .padStart(6, "0")
     );
   };
+
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -114,6 +116,7 @@ export default function ReportsPage() {
         `${Server_Url}/php/index.php/api/reports/${params.reportNo}/${params.projectID}`
       )
       .then((res) => {
+        // console.log(res.data);
         let da = res.data.data;
         let final = groupBySbNo(da);
         let finalArr = [];
@@ -164,7 +167,6 @@ export default function ReportsPage() {
 
           return 0;
         });
-        console.log(finalArr);
         let finalLabels = [];
         let totalDuration = 0;
 
@@ -172,9 +174,6 @@ export default function ReportsPage() {
           totalDuration += +el.total_duration;
           finalLabels.push(el.sb_name);
         });
-
-        console.log(`Aircraft Total is : ${totalDuration}`);
-
         let finalData = [];
         let totalPercent = 0;
         finalArr.forEach((el) => {
@@ -194,6 +193,7 @@ export default function ReportsPage() {
           ],
         };
         setChart1_data(obj);
+        // console.log(finalArr);
         setReportData(finalArr);
       })
       .catch((err) => {
@@ -227,6 +227,7 @@ export default function ReportsPage() {
       setChart2(obj);
     }
   }, [modalIndex]);
+
   useEffect(() => {
     getReportData();
   }, []);
@@ -253,20 +254,44 @@ export default function ReportsPage() {
                   <thead>
                     <tr>
                       <th className="col-4 bg-secondary text-white">
-                        Service Bulliten No
+                        Service Bulliten Name
                       </th>
                       <td className="col-8" colSpan={2}>
-                        {reportData[modalIndex]["sb_name"]}
+                        {reportData[modalIndex]["row_data"][0]["sb_desc"]}
                       </td>
                     </tr>
                     <tr>
                       <th className="bg-secondary text-white">
-                        Estimated Duration
+                        IPACO Estimated Duration
                       </th>
                       <td colSpan={2}>
                         {reportData[modalIndex]["total_duration"]} Hrs
                       </td>
                     </tr>
+
+                    <tr>
+                      <th className="bg-secondary text-white">
+                        Leonardo Issued Duration
+                      </th>
+                      <td colSpan={2}>
+                        {
+                          reportData[modalIndex]["row_data"][0][
+                            "issued_duration"
+                          ]
+                        }{" "}
+                        Hrs
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <th className="bg-secondary text-white">
+                        Actual Work Duration
+                      </th>
+                      <td colSpan={2}>
+                        {reportData[modalIndex]["total_duration"]} Hrs
+                      </td>
+                    </tr>
+
                     <tr>
                       <th className="bg-secondary text-white">SB Progress %</th>
                       <td colSpan={2}>
@@ -281,10 +306,10 @@ export default function ReportsPage() {
                         Part Name
                       </th>
                       <th className="col-4 bg-dark text-white py-2">
-                        Structure %
+                        Structure
                       </th>
                       <th className="col-4 bg-dark text-white py-2">
-                        Avionics %
+                        Avionics
                       </th>
                     </tr>
                     {reportData[modalIndex]["row_data"].map((part, index) => {
@@ -296,7 +321,7 @@ export default function ReportsPage() {
                               <br />
                               {part.total_duration.toFixed(2)} Hrs
                             </td>
-                            <td>
+                            <td className="bg-secondary text-white">
                               {part.structure_duration.toFixed(2) == 0 ? (
                                 "-"
                               ) : (
@@ -316,7 +341,7 @@ export default function ReportsPage() {
                                 </p>
                               )}
                             </td>
-                            <td>
+                            <td className="bg-secondary text-white">
                               {part.avionics_duration.toFixed(2) == 0 ? (
                                 "-"
                               ) : (
@@ -338,21 +363,36 @@ export default function ReportsPage() {
                             </td>
                           </tr>
                           <tr>
-                            <th className="bg-success text-white">
-                              {(
-                                (+part.done_duration_s /
-                                  +part.structure_duration) *
-                                100
-                              ).toFixed(2)}
-                              %
+                            <th className="text-success">
+                              {isNaN(
+                                (
+                                  (+part.done_duration_s /
+                                    +part.structure_duration) *
+                                  100
+                                ).toFixed(2)
+                              )
+                                ? "-"
+                                : (
+                                    (+part.done_duration_s /
+                                      +part.structure_duration) *
+                                    100
+                                  ).toFixed(2) + " %"}
                             </th>
-                            <th className="bg-success text-white">
-                              {(
-                                (+part.done_duration_a /
-                                  +part.avionics_duration) *
-                                100
-                              ).toFixed(2)}
-                              %
+
+                            <th className="text-success">
+                              {isNaN(
+                                (
+                                  (+part.done_duration_a /
+                                    +part.avionics_duration) *
+                                  100
+                                ).toFixed(2)
+                              )
+                                ? "-"
+                                : (
+                                    (+part.done_duration_a /
+                                      +part.avionics_duration) *
+                                    100
+                                  ).toFixed(2) + " %"}
                             </th>
                           </tr>
                         </React.Fragment>

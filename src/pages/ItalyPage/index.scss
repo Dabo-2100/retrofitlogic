@@ -1,0 +1,12 @@
+#kpiReport {
+  height: 100vh;
+  overflow-y: auto;
+  table {
+    th,
+    td,
+    tr {
+      vertical-align: middle;
+      text-align: center;
+    }
+  }
+}

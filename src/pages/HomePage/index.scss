@@ -5,6 +5,7 @@
     width: calc(100% - 250px);
     height: 100%;
     overflow: auto;
+    flex-grow: 1;
   }
   .Modal {
     position: fixed;
