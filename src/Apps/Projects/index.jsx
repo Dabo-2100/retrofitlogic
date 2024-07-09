@@ -15,7 +15,7 @@ export default function Projects() {
   const { closeMenu, slideNo, modalNo } = useContext(ProjectsContext);
   return (
     <div
-      className="col-12 workingTab"
+      className="col-12 workingTab animate__animated animate__fadeIn "
       id="Projects"
       onClick={() => closeMenu()}
     >

@@ -219,7 +219,7 @@ export default function ProjectDetails() {
                   Actual Duration
                 </td>
                 <td style={{ width: "10%" }} print="false">
-                  Duration
+                  Estimated Duration
                 </td>
                 <td style={{ width: "10%" }}>Status</td>
               </tr>

@@ -34,13 +34,13 @@
     overflow-x: hidden;
     .freeMenu {
       position: fixed;
-      background-color: rgb(48, 49, 52);
+      background-color: rgba(57, 128, 192);
       border-radius: 8px;
       color: white;
       li {
         cursor: pointer;
         &:hover {
-          background-color: #3c3d40;
+          background-color: #222b473c;
         }
         list-style: none;
       }

@@ -109,13 +109,13 @@ export default function ProjectsList() {
           {/* <li className="d-flex gap-2 p-2" onClick={() => openSlide(3)}>
             <FontAwesomeIcon icon={faPenToSquare} /> Edit Project
           </li> */}
-          <li
+          {/* <li
             className="d-flex gap-2 p-2"
             onClick={trashProject}
             style={{ color: "rgb(255, 49, 55)" }}
           >
             <FontAwesomeIcon icon={faTrashCan} /> Remove Project
-          </li>
+          </li> */}
           <li className="d-flex gap-2 p-2" onClick={cloneProject}>
             <FontAwesomeIcon icon={faClone} />
             Reports
@@ -123,7 +123,7 @@ export default function ProjectsList() {
         </ul>
       ) : null}
       <header className="col-12 d-flex justify-content-between">
-        <h1 className="header">All Projects</h1>
+        <h1 className="header fs-5 mb-1">All Projects</h1>
         <div className="actions">
           {/* <button className="btn btn-success" onClick={() => openModal(1)}>
             New Project

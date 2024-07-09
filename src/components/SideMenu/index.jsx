@@ -7,17 +7,18 @@ import { faBars, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo-Light.png";
+import icon from "@/assets/ipaco_logo.png";
 import UserBox from "./UserBox";
 // import { user_login } from "../../../pages/Api";
 export default function SideMenu() {
   const navigate = useNavigate();
   const [tabs] = useRecoilState($HomeTabs);
-  const [token, setToken] = useRecoilState($Token);
+  const [, setToken] = useRecoilState($Token);
   const [user_info, setUserInfo] = useRecoilState($User_Info);
   const [activeTab, setActiveTab] = useRecoilState($ActiveHomeTab);
   const [activeApps, setActiveApps] = useState([]);
 
-  const [isPhone, setIsPhone] = useState(false);
+  const [menuStatus, setMenuStaus] = useState(false);
 
   const openTab = (id) => {
     setActiveTab(id);
@@ -37,7 +38,9 @@ export default function SideMenu() {
       }
     });
   };
-
+  const handleShrink = () => {
+    alert('test');
+  };
   useEffect(() => {
     // console.log(user_info);
     setActiveApps(
@@ -55,16 +58,18 @@ export default function SideMenu() {
       style={{ animationDuration: "600ms" }}
     >
       <div
-        style={{ borderBottom: "solid #2b313e 2px" }}
-        className="d-flex flex-row justify-content-between px-4 align-items-center col-12"
+        style={{ borderBottom: "solid #2b313e 1px" }}
+        className="d-flex flex-row justify-content-between p-3 align-items-center col-12"
       >
-        <img
-          className="py-0 logo"
-          src={Logo}
-          width={103}
-          style={{ scale: 1.2 }}
+        <div className="d-flex align-items-center gap-1">
+          <img className="py-0 logo" src={icon} width={30} />
+          <p className="mb-0 text-white">iPACOFit</p>
+        </div>
+        <FontAwesomeIcon
+          icon={faBars}
+          className="iconBars"
+          onClick={handleShrink}
         />
-        <FontAwesomeIcon icon={faBars} className="fs-3 text-white" />
       </div>
       <ul>
         {tabs.map((tab, index) => {

@@ -21,6 +21,7 @@ import Swal from "sweetalert2";
 export default function Tasklist(props) {
   const tasklist = useRef();
   const {
+    task_id: theTask_id,
     setTask_id,
     taskListContext: contextIndex,
     setTaskListContext: setContextIndex,
@@ -58,6 +59,7 @@ export default function Tasklist(props) {
         )
         .then((res) => {
           if (!res.data.err) {
+            console.log(res.data.data);
             setTasks(res.data.data);
           } else {
             setTasks([]);
@@ -130,7 +132,7 @@ export default function Tasklist(props) {
 
   const updateDate = async (event) => {
     let newdate = event.target.value;
-    let newStart = newdate.split("T")[0] + " " + newdate.split("T")[1]; // Ensure date format is consistent
+    let newStart = newdate.split("T")[0] + " " + "08:00:00"; // Ensure date format is consistent
 
     const confirmation = await Swal.fire({
       showDenyButton: true,
@@ -262,6 +264,37 @@ export default function Tasklist(props) {
     }
   };
 
+  const switchDepartment = () => {
+    Swal.fire({
+      icon: "question",
+      text: "Are you sure you want to change the task department ?",
+      showConfirmButton: true,
+      showDenyButton: true,
+      denyButtonText: "No",
+      confirmButtonText: "Yes",
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        setLoaderIndex(1);
+        axios
+          .post(
+            `${Server_Url}/php/index.php/api/tasks/${theTask_id}/switch`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+          .then((res) => {
+            if (!res.data.err) {
+              reloadTasklists();
+              setLoaderIndex(0);
+            }
+          });
+      }
+    });
+  };
+
   useEffect(() => {
     getTasklistTasks();
   }, [reloadTasklistsIndex]);
@@ -318,9 +351,12 @@ export default function Tasklist(props) {
                 <FontAwesomeIcon icon={faPenToSquare} />
                 <p>Rename Task</p>
               </div>
-              <div className="col-12 d-flex align-item-center gap-3 p-2">
+              <div
+                className="col-12 d-flex align-item-center gap-3 p-2"
+                onClick={switchDepartment}
+              >
                 <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
-                <p>Move Task</p>
+                <p>Switch Department</p>
               </div>
             </div>
           ) : null}
@@ -442,7 +478,7 @@ export default function Tasklist(props) {
                       >
                         {dateIndex == 0 && index == 0 ? (
                           <input
-                            type="datetime-local"
+                            type="date"
                             defaultValue={task.task_start_date}
                             onChange={updateDate}
                           />
@@ -459,6 +495,10 @@ export default function Tasklist(props) {
                         <div className="col-12 d-flex gap-3 align-items-center">
                           <input
                             type="number"
+                            min="0"
+                            onKeyPress={(e) => {
+                              e.key == "-" ? e.preventDefault() : null;
+                            }}
                             defaultValue={task.actual_duration}
                             onContextMenu={(event) => {
                               event.preventDefault();
