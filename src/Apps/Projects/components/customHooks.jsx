@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { $Server, $Token } from "@/store";
 
+let status = [];
+
 export const getTodayDate = () => {
   const now = new Date();
   return `${now.getFullYear()}-${
@@ -27,18 +29,23 @@ export const useProjectStatus = () => {
   const [token] = useRecoilState($Token);
   const [res, setRes] = useState([]);
   useEffect(() => {
-    axios
-      .get(`${Server_Url}/php/index.php/api/projects/status`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setRes(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (status.length == 0) {
+      axios
+        .get(`${Server_Url}/php/index.php/api/projects/status`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setRes(res.data.data);
+          status = res.data.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setRes(status);
+    }
   }, []);
   return res;
 };
@@ -92,14 +99,14 @@ export const getDueDate = (startDatetime, durationHours) => {
   // const offsetMinutes = -1 * new Date().getTimezoneOffset();
   let taskDurationMins = durationHours * 60;
   let startDate = new Date(startDatetime);
-  
+
   let workStartAt = new Date(startDate.setHours(8, 0));
   let workEndAt = new Date(startDate.setHours(16, 0));
   let workDiff = workEndAt - workStartAt;
   let workingMintsPerDay = workDiff / (1000 * 60);
   let remainWorkMins =
     (new Date(workEndAt) - new Date(startDatetime)) / (1000 * 60);
-    
+
   let dueDate = new Date(startDatetime);
   if (taskDurationMins <= remainWorkMins) {
     let newTime = dueDate.getMinutes() + taskDurationMins;

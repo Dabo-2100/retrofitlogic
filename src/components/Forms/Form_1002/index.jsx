@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./index.scss";
-import Logo from "@/assets/Orignal-Logo.png";
+import Logo from "@/assets/New_Logo.png";
 import { useRecoilState } from "recoil";
 import { $Resizer } from "@/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

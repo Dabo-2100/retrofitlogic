@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from "react";
 import "./index.scss";
-import Logo from "@/assets/Orignal-Logo.png";
+import Logo from "@/assets/New_Logo.png";
 import { $Resizer, $FormData } from "@/store";
 import { useRecoilState } from "recoil";
 

@@ -166,7 +166,7 @@ export default function ItalyPage() {
             </thead>
             <tbody>
               {tableData.map((sb, index) => {
-                console.log(sb);
+                // console.log(sb);
                 return (
                   <tr key={index}>
                     <td>{index + 1}</td>

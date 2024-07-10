@@ -128,7 +128,7 @@ export default function Modal_add_connector_to_aircraft() {
                     </thead>
                     <tbody>
                         {searchRes.map((connector, index) => {
-                            console.log(connector);
+                            // console.log(connector);
                             return (
                                 <tr key={index}>
                                     <td>{index + 1}</td>

@@ -47,12 +47,12 @@ export default function ItemsFinder() {
       )
       .then((Res) => {
         let res = Res.data;
-        console.log(res);
+        // console.log(res);
         if (!res.err) {
           setSearchResult(res.data);
         } else {
           setSearchResult([]);
-          console.log("There is no products with that value");
+          // console.log("There is no products with that value");
         }
       })
       .catch((err) => {

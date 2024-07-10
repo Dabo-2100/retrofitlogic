@@ -20,6 +20,8 @@ export default function ProjectDetails() {
     project_id,
     reloadTasklists,
     reloadTasklistsIndex,
+    openSlide,
+    reloadProjects,
     openModal,
     project_name,
     setFilter,
@@ -130,7 +132,13 @@ export default function ProjectDetails() {
             className="d-flex gap-3 align-items-center"
             style={{ color: "white" }}
           >
-            <FontAwesomeIcon icon={faHouse} />
+            <FontAwesomeIcon
+              icon={faHouse}
+              onClick={() => {
+                openSlide(1);
+                reloadProjects();
+              }}
+            />
             <FontAwesomeIcon icon={faAngleRight} />
             <p className="m-0">{project_name}</p>
           </div>

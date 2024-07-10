@@ -17,7 +17,7 @@ export default function Modal_Product_Qty() {
             }
         }).then((Res) => {
             let res = Res.data;
-            console.log(res);
+            // console.log(res);
             if (!res.err) {
                 setQtyDetailed(res.data);
             }

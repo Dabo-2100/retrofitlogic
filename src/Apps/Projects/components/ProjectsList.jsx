@@ -147,6 +147,7 @@ export default function ProjectsList() {
             return (
               <tr
                 key={project.project_id}
+                onDoubleClick={() => openSlide(2)}
                 onContextMenu={() =>
                   handleRightClick(project.project_id, project.project_name)
                 }

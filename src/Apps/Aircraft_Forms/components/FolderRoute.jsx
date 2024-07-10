@@ -110,7 +110,7 @@ export default function FolderRoute() {
         let y = allForms[form_type].slice(((toPage - 1) * folderNo), (toPage * folderNo))
         oldView[form_type] = y;
         setFormsToView(oldView);
-        console.log(allForms);
+        // console.log(allForms);
 
     }
 
@@ -146,7 +146,7 @@ export default function FolderRoute() {
                 }
             }
             else {
-                console.log(res.data);
+                // console.log(res.data);
                 Swal.fire({
                     icon: "error",
                     text: "There is no logs here",

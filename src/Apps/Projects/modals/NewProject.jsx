@@ -30,7 +30,7 @@ export default function NewProject() {
                 Authorization: `Bearer ${token}`,
             }
         }).then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
             if (!res.data.err) {
                 Swal.fire({
                     icon: "success",

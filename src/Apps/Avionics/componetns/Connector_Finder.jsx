@@ -58,7 +58,7 @@ export default function Connector_Finder() {
                         <tbody>
                             {
                                 res.map((connector, index) => {
-                                    console.log(connector);
+                                    // console.log(connector);
                                     return (
                                         <>
                                             <tr key={index} style={{ borderTop: "3px solid rgb(77, 81, 84)" }}>

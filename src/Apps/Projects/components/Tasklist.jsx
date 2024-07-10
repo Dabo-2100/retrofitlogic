@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   faChevronDown,
   faChevronRight,
@@ -36,7 +34,7 @@ export default function Tasklist(props) {
 
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
-
+  const [checked, setChecked] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [collapseIndex, setCollapseIndex] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -59,7 +57,7 @@ export default function Tasklist(props) {
         )
         .then((res) => {
           if (!res.data.err) {
-            console.log(res.data.data);
+            // console.log(res.data.data);
             setTasks(res.data.data);
           } else {
             setTasks([]);
@@ -92,6 +90,7 @@ export default function Tasklist(props) {
           console.log(err);
         });
     }
+    setChecked(true);
   };
 
   const handleAddTask = () => {
@@ -354,17 +353,18 @@ export default function Tasklist(props) {
   };
 
   useEffect(() => {
-    getTasklistTasks();
+    if (collapseIndex || filter.data.status != 0) {
+      getTasklistTasks();
+    }
   }, [reloadTasklistsIndex]);
 
   return (
     <>
-      {tasks.length != 0 ? (
+      {tasks.length != 0 || checked == false ? (
         <div
           className={`col-12 Tasklist d-flex flex-wrap ${props.type}`}
           ref={tasklist}
         >
-          <ToastContainer />
           {selectedTasks.length != 0 ? (
             <div className="col-12 d-flex gap-3 align-items-center text-white bg-danger p-3 sticky-top ">
               <label className="text-center col-3">Change Tasks Status</label>
@@ -427,7 +427,9 @@ export default function Tasklist(props) {
                   style={{ width: "4%" }}
                   onClick={() => {
                     setCollapseIndex(!collapseIndex);
-                    getTasklistTasks();
+                    if (collapseIndex == false) {
+                      getTasklistTasks();
+                    }
                   }}
                 >
                   <FontAwesomeIcon

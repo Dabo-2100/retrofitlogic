@@ -54,7 +54,7 @@ export default function Modal_aircraft_connectos() {
       )
       .then((Res) => {
         let res = Res.data;
-        console.log(res.msg);
+        // console.log(res.msg);
         if (!res.err) {
           setSearchRes(res.data);
           setViewRows(res.data);

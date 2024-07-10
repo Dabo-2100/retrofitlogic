@@ -59,7 +59,7 @@ export default function AddTask() {
         }
       )
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         Swal.fire({
           icon: "success",
           text: "Task Added Successfuly",
@@ -142,7 +142,7 @@ export default function AddTask() {
             <select
               defaultValue={list_id}
               onChange={(e) => {
-                console.log(e.target.value);
+                // console.log(e.target.value);
               }}
               className="col-12 form-select"
               ref={tasklist_id}
