@@ -50,14 +50,6 @@ export default function ItalyPage() {
         display: true,
         position: "right",
       },
-      // y1: {
-      //   type: "linear",
-      //   display: true,
-      //   position: "right",
-      //   grid: {
-      //     drawOnChartArea: false,
-      //   },
-      // },
     },
   };
   const labels = [
@@ -74,7 +66,7 @@ export default function ItalyPage() {
     datasets: [
       {
         label: "Uniform Progress",
-        data: [0, 15, 30, 45, 60, 75, 100],
+        data: [0, 16.5, 33, 49.5, 66, 82.5, 100],
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
         // yAxisID: "y",
@@ -157,9 +149,9 @@ export default function ItalyPage() {
   }, []);
   return (
     <div className="col-12 bg-white p-3 d-flex flex-wrap" id="kpiReport">
-      <h1 className="col-12">Time Compare</h1>
-      <section className="col-12 container d-flex gap-3">
-        <div className="col-12 col-md-8 d-flex">
+      <h1 className="col-12 text-center">Time Compare</h1>
+      <section className="col-12 container d-flex flex-column gap-3 justify-content-center align-items-center">
+        <div className="col-12 d-flex">
           <table className="table table-bordered table-hover table-dark">
             <thead>
               <tr>
@@ -206,7 +198,7 @@ export default function ItalyPage() {
             </tbody>
           </table>
         </div>
-        <div className="col-12 col-md-4 d-flex">
+        <div className="col-10 d-flex">
           <Line options={options} data={data} />;
         </div>
       </section>

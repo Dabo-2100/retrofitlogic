@@ -12,10 +12,13 @@ import {
   faEthernet,
 } from "@fortawesome/free-solid-svg-icons";
 
+const url = window.location.href;
+let isLocal = url.includes("localhost");
+let final = isLocal ? "http://localhost/retrofit/public" : "";
 export const $Server = atom({
   key: "$Server",
-  default: "",
-  // default: "http://localhost/retrofit/public",
+  // default: "",
+  default: final,
 });
 
 export const $Token = atom({

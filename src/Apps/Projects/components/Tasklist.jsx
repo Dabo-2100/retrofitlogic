@@ -44,7 +44,7 @@ export default function Tasklist(props) {
 
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
-
+  const [taskIDDesc, setTaskIDDesc] = useState();
   const getTasklistTasks = () => {
     setSelectedTasks([]);
     if (filter.data.status == 0) {
@@ -295,6 +295,64 @@ export default function Tasklist(props) {
     });
   };
 
+  const handleRedesc = () => {
+    axios
+      .post(
+        `${Server_Url}/php/index.php/api/tasks/${taskIDDesc}/redescr`,
+        {
+          task_desc: event.target.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (!res.data.err) {
+          setTaskIDDesc(undefined);
+          reloadTasklists();
+          Swal.fire({
+            icon: "success",
+            text: "Description Updated Successfuly",
+            timer: 1200,
+            position: "top-right",
+            width: "300px",
+            showConfirmButton: false,
+          });
+        }
+      });
+  };
+
+  const handleRename = () => {
+    axios
+      .post(
+        `${Server_Url}/php/index.php/api/tasks/${taskIDDesc}/redescr`,
+        {
+          task_name: event.target.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (!res.data.err) {
+          setTaskIDDesc(undefined);
+          reloadTasklists();
+          Swal.fire({
+            icon: "success",
+            text: "Description Updated Successfuly",
+            timer: 1200,
+            position: "top-right",
+            width: "300px",
+            showConfirmButton: false,
+          });
+        }
+      });
+  };
+
   useEffect(() => {
     getTasklistTasks();
   }, [reloadTasklistsIndex]);
@@ -446,6 +504,22 @@ export default function Tasklist(props) {
                         }}
                       >
                         <div className="col-12 d-flex gap-3 justify-content-center">
+                          {/* {taskIDDesc == task.task_id ? (
+                            <input
+                              className="form-control"
+                              onKeyUp={() => {
+                                event.keyCode == 13 ? handleRename() : null;
+                              }}
+                              onBlur={handleRename}
+                              defaultValue={task.task_name}
+                            />
+                          ) : (
+                            <p
+                              onDoubleClick={() => setTaskIDDesc(task.task_id)}
+                            >
+                              {task.task_name}
+                            </p>
+                          )} */}
                           <p>{task.task_name}</p>
                           {task.comment_count ? (
                             <FontAwesomeIcon
@@ -458,7 +532,25 @@ export default function Tasklist(props) {
                           ) : null}
                         </div>
                       </td>
-                      <td style={{ width: "16%" }}>{task.task_desc}</td>
+                      <td
+                        style={{ width: "16%" }}
+                        onDoubleClick={() => setTaskIDDesc(task.task_id)}
+                      >
+                        {taskIDDesc == task.task_id ? (
+                          <input
+                            className="form-control"
+                            onKeyUp={() => {
+                              event.keyCode == 13 ? handleRedesc() : null;
+                            }}
+                            onBlur={handleRedesc}
+                            defaultValue={task.task_desc}
+                          />
+                        ) : (
+                          <p onDoubleClick={() => setTaskIDDesc(task.task_id)}>
+                            {task.task_desc}
+                          </p>
+                        )}
+                      </td>
                       <td style={{ width: "20%" }} print="true">
                         {
                           <ProgressBar
