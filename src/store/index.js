@@ -17,7 +17,6 @@ let isLocal = url.includes("localhost");
 let final = isLocal ? "http://localhost/retrofit/public" : "";
 export const $Server = atom({
   key: "$Server",
-  // default: "",
   default: final,
 });
 
