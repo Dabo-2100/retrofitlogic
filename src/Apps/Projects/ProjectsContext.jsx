@@ -25,11 +25,8 @@ const MenuProvider = ({ children }) => {
 
   const [project_id, setProject_id] = useState();
   const [project_name, setProject_name] = useState();
-
   const [task_id, setTask_id] = useState();
-
   const [list_id, setTasklist_id] = useState();
-
   const [slideNo, setSlideNo] = useState(1);
   const openSlide = (no) => setSlideNo(no);
 
@@ -42,6 +39,16 @@ const MenuProvider = ({ children }) => {
 
   const [reloadTasklistsIndex, setreloadTasklists] = useState(0);
   const reloadTasklists = () => setreloadTasklists(reloadTasklistsIndex + 1);
+
+  const [reloadCommentsIndex, setReloadCommentsIndex] = useState(0);
+  const reloadComments = () => setReloadCommentsIndex(reloadCommentsIndex + 1);
+
+  const [reloadCertainTaskListIndex, setReloadCertainTaskListIndex] =
+    useState(0);
+  const reloadCertainTaskList = (tasklist_id) => {
+    setTasklist_id(tasklist_id);
+    setReloadCertainTaskListIndex(reloadCertainTaskListIndex + 1);
+  };
 
   const [editProgress, setEditProgress] = useState({
     index: false,
@@ -99,6 +106,10 @@ const MenuProvider = ({ children }) => {
         setFilter,
         task_id,
         setTask_id,
+        reloadCertainTaskListIndex,
+        reloadCertainTaskList,
+        reloadCommentsIndex,
+        reloadComments,
       }}
     >
       {children}

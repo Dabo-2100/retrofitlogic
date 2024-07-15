@@ -1,18 +1,28 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ProjectsContext } from "../ProjectsContext";
 import { useRecoilState } from "recoil";
 import { $LoaderIndex, $Server, $Token, $User_Info } from "@/store";
 import axios from "axios";
 import Comment from "../components/Comment";
+import { useCommentTypes } from "../components/customHooks";
 
 export default function TaskComments() {
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const [userInfo] = useRecoilState($User_Info);
-  const [reloadIndex, setReloadIndex] = useState(0);
-  const { task_id, closeModal, setTask_id, reloadTasklists } =
+  const { reloadCommentsIndex: reloadIndex, reloadComments } =
     useContext(ProjectsContext);
+  const [newCommentType, setNewCommentType] = useState(0);
+  const commentTypes = useCommentTypes();
+  const {
+    list_id,
+    task_id,
+    closeModal,
+    setTask_id,
+    reloadTasklists,
+    reloadCertainTaskList: reloadMe,
+  } = useContext(ProjectsContext);
   const [taskComments, setTaskComments] = useState([]);
   const newComment = useRef();
 
@@ -27,7 +37,6 @@ export default function TaskComments() {
       .then((res) => {
         setLoaderIndex(0);
         setTaskComments(res.data.data);
-        // console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -42,6 +51,7 @@ export default function TaskComments() {
           comment_name: newComment.current.value,
           author_id: userInfo.user_id,
           task_id: task_id,
+          comment_type_id: +newCommentType,
         };
 
         let response = await axios.post(
@@ -58,8 +68,9 @@ export default function TaskComments() {
           }
         );
         newComment.current.value = "";
-        setReloadIndex(reloadIndex + 1);
-        reloadTasklists();
+        reloadComments();
+        // reloadTasklists();
+        reloadMe(list_id);
       } catch (error) {
         console.error(`Error submitting task ${order}:`, error);
       }
@@ -82,26 +93,15 @@ export default function TaskComments() {
       <div
         onClick={(event) => event.stopPropagation()}
         className="col-12 d-flex flex-wrap bg-white col-11 col-md-8 p-3 rounded gap-3"
-        style={{ maxHeight: "80vh", overflowY: "auto" }}
+        style={{
+          maxHeight: "80vh",
+          overflowY: "auto",
+          // backgroundColor: "rgb(3, 15, 22)",
+        }}
       >
         <h4 className="col-12">
           Task Comments ({taskComments ? taskComments.length : "0"})
         </h4>
-
-        {taskComments ? (
-          <div className="col-12 d-flex flex-wrap gap-3">
-            {taskComments.map((comment, index) => {
-              comment.user_name = "Dabo";
-              return (
-                <Comment
-                  username={comment.user_name}
-                  content={comment.comment_name}
-                  date={comment.created_at}
-                />
-              );
-            })}
-          </div>
-        ) : null}
 
         <form
           className="col-12 d-flex gap-3 align-items-center"
@@ -112,8 +112,52 @@ export default function TaskComments() {
             className="form-control"
             placeholder="Enter New Comment"
           ></textarea>
-          <button className="btn btn-primary col-3">Add</button>
+          <div className="col-3 d-flex flex-wrap">
+            <select
+              className="form-select col-12"
+              defaultValue={-1}
+              onChange={(event) => setNewCommentType(event.target.value)}
+            >
+              <option value={-1} hidden disabled>
+                Comment Type
+              </option>
+              {commentTypes.map((el, index) => {
+                return (
+                  <option key={index} value={el.type_id}>
+                    {el.type_name}
+                  </option>
+                );
+              })}
+            </select>
+            <button
+              className="btn btn-primary col-12"
+              disabled={newCommentType == 0 ? true : false}
+            >
+              Add
+            </button>
+          </div>
         </form>
+
+        {taskComments ? (
+          <div className="col-12 d-flex flex-wrap gap-3">
+            {taskComments.map((comment, index) => {
+              comment.user_name = "Dabo";
+              return (
+                <React.Fragment key={index}>
+                  <Comment
+                    related_comment={comment.related_comment}
+                    comment_id={comment.comment_id}
+                    other={taskComments}
+                    type={comment.comment_type_name}
+                    username={comment.user_name}
+                    content={comment.comment_name}
+                    date={comment.created_at}
+                  />
+                </React.Fragment>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </div>
   );

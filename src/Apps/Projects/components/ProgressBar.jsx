@@ -10,7 +10,7 @@ export default function ProgressBar(props) {
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const [editIndex, setEditIndex] = useState(false);
-  const { reloadTasklists } = useContext(ProjectsContext);
+  const { reloadCertainTaskList: reloadMe } = useContext(ProjectsContext);
   const step = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const progress = useRef();
   const handleClick = () => {
@@ -54,7 +54,8 @@ export default function ProgressBar(props) {
         }
       )
       .then((res) => {
-        reloadTasklists();
+        reloadMe(props.tasklist_id);
+        // reloadTasklists();
       })
       .catch((err) => {
         Swal.fire({

@@ -18,11 +18,23 @@
   }
   position: relative;
   table {
+    &:hover {
+      background-color: transparent !important;
+    }
     th,
     tr,
     td {
       text-align: center;
       vertical-align: middle;
+    }
+    tr {
+      &:hover {
+        cursor: pointer;
+        background-color: #144963 !important;
+        td {
+          background-color: #144963 !important;
+        }
+      }
     }
   }
   .listTasks {

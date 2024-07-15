@@ -4,6 +4,7 @@ import { useRecoilState } from "recoil";
 import { $Server, $Token } from "@/store";
 
 let status = [];
+let commentTypes = [];
 
 export const getTodayDate = () => {
   const now = new Date();
@@ -45,6 +46,32 @@ export const useProjectStatus = () => {
         });
     } else {
       setRes(status);
+    }
+  }, []);
+  return res;
+};
+
+export const useCommentTypes = () => {
+  const [Server_Url] = useRecoilState($Server);
+  const [token] = useRecoilState($Token);
+  const [res, setRes] = useState([]);
+  useEffect(() => {
+    if (commentTypes.length == 0) {
+      axios
+        .get(`${Server_Url}/php/index.php/api/projects/commenttypes`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setRes(res.data.data);
+          commentTypes = res.data.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setRes(commentTypes);
     }
   }, []);
   return res;

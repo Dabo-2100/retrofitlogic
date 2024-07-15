@@ -18,6 +18,8 @@ import Swal from "sweetalert2";
 
 export default function Tasklist(props) {
   const tasklist = useRef();
+  // reloadCertainTaskListIndex
+  // reloadCertainTaskList
   const {
     task_id: theTask_id,
     setTask_id,
@@ -26,6 +28,9 @@ export default function Tasklist(props) {
     project_id,
     openModal,
     setTasklist_id,
+    list_id,
+    reloadCertainTaskListIndex: reloadMeIndex,
+    reloadCertainTaskList: reloadMe,
     reloadTasklistsIndex,
     reloadTasklists,
     filter,
@@ -45,6 +50,7 @@ export default function Tasklist(props) {
   const [taskIDDesc, setTaskIDDesc] = useState();
   const getTasklistTasks = () => {
     setSelectedTasks([]);
+    // alert(filter.data.status);
     if (filter.data.status == 0) {
       axios
         .get(
@@ -104,10 +110,10 @@ export default function Tasklist(props) {
 
   const updateStatus = async (task_id, newStatus, oldVal = 0) => {
     let data = {};
-    if (oldVal == 4) {
+    if (oldVal == 4 || oldVal == 5 || oldVal == 0) {
       data.task_progress = 0;
     }
-    if (newStatus == 4) {
+    if (newStatus == 4 || newStatus == 5) {
       data.task_progress = 100;
     }
     data.task_status_id = newStatus;
@@ -124,9 +130,9 @@ export default function Tasklist(props) {
         },
       }
     );
-    reloadTasklists();
+    reloadMe(props.id);
+    // reloadTasklists();
     setEditIndex(null);
-    // alert(`Change task : ${task_id} to ${newStatus}`);
   };
 
   const updateDate = async (event) => {
@@ -171,7 +177,8 @@ export default function Tasklist(props) {
         // Optionally, add user feedback for errors here
       } finally {
         setLoaderIndex(0);
-        reloadTasklists();
+        // reloadTasklists();
+        reloadMe(props.id);
         setDateIndex(null);
         // Optionally, show success message
         // Swal.fire("Done");
@@ -193,7 +200,8 @@ export default function Tasklist(props) {
     Promise.all(updatePromises)
       .then(() => {
         setSelectedTasks([]);
-        reloadTasklists();
+        reloadMe(props.id);
+        // reloadTasklists();
         unSelectAll();
       })
       .catch((error) => {
@@ -259,7 +267,8 @@ export default function Tasklist(props) {
         showConfirmButton: false,
         showDenyButton: false,
       });
-      reloadTasklists();
+      reloadMe(props.id);
+      // reloadTasklists();
     }
   };
 
@@ -286,7 +295,8 @@ export default function Tasklist(props) {
           )
           .then((res) => {
             if (!res.data.err) {
-              reloadTasklists();
+              reloadMe(props.id);
+              // reloadTasklists();
               setLoaderIndex(0);
             }
           });
@@ -310,7 +320,8 @@ export default function Tasklist(props) {
       .then((res) => {
         if (!res.data.err) {
           setTaskIDDesc(undefined);
-          reloadTasklists();
+          reloadMe(props.id);
+          // reloadTasklists();
           Swal.fire({
             icon: "success",
             text: "Description Updated Successfuly",
@@ -339,7 +350,8 @@ export default function Tasklist(props) {
       .then((res) => {
         if (!res.data.err) {
           setTaskIDDesc(undefined);
-          reloadTasklists();
+          reloadMe(props.id);
+          // reloadTasklists();
           Swal.fire({
             icon: "success",
             text: "Description Updated Successfuly",
@@ -357,6 +369,12 @@ export default function Tasklist(props) {
       getTasklistTasks();
     }
   }, [reloadTasklistsIndex]);
+
+  useEffect(() => {
+    if (list_id == props.id && collapseIndex) {
+      getTasklistTasks();
+    }
+  }, [reloadMeIndex]);
 
   return (
     <>
@@ -405,10 +423,10 @@ export default function Tasklist(props) {
                 <FontAwesomeIcon icon={faComment} />
                 <p>Add Comment</p>
               </div>
-              <div className="col-12 d-flex align-item-center gap-3 p-2">
+              {/* <div className="col-12 d-flex align-item-center gap-3 p-2">
                 <FontAwesomeIcon icon={faPenToSquare} />
                 <p>Rename Task</p>
-              </div>
+              </div> */}
               <div
                 className="col-12 d-flex align-item-center gap-3 p-2"
                 onClick={switchDepartment}
@@ -428,6 +446,7 @@ export default function Tasklist(props) {
                   onClick={() => {
                     setCollapseIndex(!collapseIndex);
                     if (collapseIndex == false) {
+                      setTasklist_id(props.id);
                       getTasklistTasks();
                     }
                   }}
@@ -477,7 +496,7 @@ export default function Tasklist(props) {
           {collapseIndex ? (
             <table
               // onContextMenu={(event) => event.stopPropagation()}
-              className="col-12 table table-bordered table-dark mb-0 listTasks"
+              className="col-12 table table-bordered table-dark mb-0 listTasks animate__animated animate__fadeIn"
             >
               <tbody>
                 {tasks.map((task, index) => {
@@ -528,6 +547,7 @@ export default function Tasklist(props) {
                               icon={faComment}
                               onClick={() => {
                                 setTask_id(task.task_id);
+                                setTasklist_id(props.id);
                                 openModal(5);
                               }}
                             />
@@ -556,6 +576,7 @@ export default function Tasklist(props) {
                       <td style={{ width: "20%" }} print="true">
                         {
                           <ProgressBar
+                            tasklist_id={props.id}
                             status_id={task.task_status_id}
                             canEdit={true}
                             task_id={task.task_id}

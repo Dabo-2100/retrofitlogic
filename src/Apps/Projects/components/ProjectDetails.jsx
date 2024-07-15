@@ -11,8 +11,10 @@ import {
   faHouse,
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
+import { $LoaderIndex } from "@/store";
 
 export default function ProjectDetails() {
+  const [, setLoaderIndex] = useRecoilState($LoaderIndex);
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const {
@@ -32,6 +34,7 @@ export default function ProjectDetails() {
   const [view, setView] = useState([]);
 
   const getProjectTaskLists = () => {
+    setLoaderIndex(1);
     if (filter.data.dep == 0) {
       axios
         .get(
@@ -50,6 +53,7 @@ export default function ProjectDetails() {
             setAllTasklists([]);
             setView([]);
           }
+          setLoaderIndex(0);
         })
         .catch((err) => {
           console.log(err);
@@ -75,6 +79,7 @@ export default function ProjectDetails() {
             setAllTasklists([]);
             setView([]);
           }
+          setLoaderIndex(0);
         })
         .catch((err) => {
           console.log(err);
@@ -115,7 +120,20 @@ export default function ProjectDetails() {
     // newWin.document.close();
   };
 
+  // const filterTaskLists = () => {};
+
   useEffect(() => {
+    if (reloadTasklistsIndex == 0) {
+      setFilter({
+        index: false,
+        data: {
+          dep: 0,
+          status: 0,
+          tasklist: 0,
+        },
+      });
+    }
+    setView([]);
     getProjectTaskLists();
   }, [reloadTasklistsIndex]);
 
@@ -213,31 +231,35 @@ export default function ProjectDetails() {
           <table className="table col-12 table-dark table-bordered mb-0">
             <thead>
               <tr>
-                <td style={{ width: "4%" }} print="false">
+                <th style={{ width: "4%" }} print="false">
                   -
-                </td>
-                <td style={{ width: "26%" }}>Task name</td>
-                <td style={{ width: "20%" }} print="false">
+                </th>
+                <th style={{ width: "26%" }}>SB Part Name / Task name</th>
+                <th style={{ width: "20%" }} print="false">
                   % Progress
-                </td>
-                <td style={{ width: "15%" }} print="false">
+                </th>
+                <th style={{ width: "15%" }} print="false">
                   Start date
-                </td>
-                <td style={{ width: "15%" }} print="false">
+                </th>
+                <th style={{ width: "15%" }} print="false">
                   Actual Duration
-                </td>
-                <td style={{ width: "10%" }} print="false">
+                </th>
+                <th style={{ width: "10%" }} print="false">
                   Estimated Duration
-                </td>
-                <td style={{ width: "10%" }}>Status</td>
+                </th>
+                <th style={{ width: "10%" }}>Status</th>
               </tr>
             </thead>
           </table>
-          {view.map((tasklist) => {
+          {view.map((tasklist, index) => {
             return (
               <div
                 key={tasklist.tasklist_id}
-                className="col-12 tasklistRow d-flex flex-wrap gap-0"
+                className="col-12 tasklistRow d-flex flex-wrap gap-0 animate__animated animate__fadeIn"
+                style={{
+                  animationDuration: "200ms",
+                  animationDelay: `${150 * (1 + index)}ms`,
+                }}
               >
                 <Tasklist
                   id={tasklist.tasklist_id}

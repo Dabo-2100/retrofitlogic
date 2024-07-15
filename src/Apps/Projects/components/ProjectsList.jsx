@@ -17,7 +17,6 @@ export default function ProjectsList() {
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
-  const [allProjects, setAllProjects] = useState([]);
   const {
     menuIndex,
     openMenu,
@@ -26,8 +25,11 @@ export default function ProjectsList() {
     setProject_name,
     openSlide,
     openModal,
+    setFilter,
     reloadProjectsIndex,
   } = useContext(ProjectsContext);
+
+  const [allProjects, setAllProjects] = useState([]);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
   const getAllProjects = () => {
@@ -40,7 +42,6 @@ export default function ProjectsList() {
       })
       .then((Res) => {
         let res = Res.data;
-        console.log(res);
         setAllProjects(res.data);
         setLoaderIndex(0);
       })
@@ -55,6 +56,14 @@ export default function ProjectsList() {
     openMenu();
     setProject_id(project_id);
     setProject_name(project_name);
+    setFilter({
+      index: false,
+      data: {
+        dep: 0,
+        status: 0,
+        tasklist: 0,
+      },
+    });
   };
 
   const trashProject = () => {
@@ -100,7 +109,11 @@ export default function ProjectsList() {
       {menuIndex ? (
         <ul
           className="freeMenu p-0 d-flex flex-column gap-1 p-2"
-          style={{ top: menuPos.y + "px", left: menuPos.x + "px" }}
+          style={{
+            top: menuPos.y + "px",
+            left: menuPos.x + "px",
+            zIndex: 1000,
+          }}
         >
           {/* <li className="d-flex gap-2 p-2"><FontAwesomeIcon icon={faObjectUngroup} /> Access Project in New Tab</li> */}
           <li className="d-flex gap-2 p-2" onClick={() => openSlide(2)}>
@@ -130,7 +143,7 @@ export default function ProjectsList() {
           </button> */}
         </div>
       </header>
-      <table className="col-12 table table-bordered table-dark table-hover">
+      <table className="col-12 table table-bordered table-dark">
         <thead>
           <tr>
             <th>-</th>
@@ -146,8 +159,25 @@ export default function ProjectsList() {
           {allProjects.map((project, index) => {
             return (
               <tr
+                className={`animate__animated animate__fadeIn`}
+                style={{
+                  animationDuration: "400ms",
+                  animationDelay: `${250 * (1 + index)}ms`,
+                }}
                 key={project.project_id}
-                onDoubleClick={() => openSlide(2)}
+                onDoubleClick={() => {
+                  setProject_id(project.project_id);
+                  setProject_name(project.project_name);
+                  setFilter({
+                    index: false,
+                    data: {
+                      dep: 0,
+                      status: 0,
+                      tasklist: 0,
+                    },
+                  });
+                  openSlide(2);
+                }}
                 onContextMenu={() =>
                   handleRightClick(project.project_id, project.project_name)
                 }
