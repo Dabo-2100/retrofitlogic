@@ -9,6 +9,7 @@ import ActivatePage from "./pages/ActivePage";
 import ReportsPage from "./pages/ReportsPage";
 import { useEffect, useState } from "react";
 import ItalyPage from "./pages/ItalyPage";
+import { ReportProvider } from "./pages/ReportsPage/ReportContext";
 export default function App() {
   const [innerH, setInnerH] = useState(window.innerHeight);
   useEffect(() => {
@@ -31,7 +32,11 @@ export default function App() {
             <Route path="kpi/:aircraft_sn" element={<ItalyPage />}></Route>
             <Route
               path="report/:reportNo/:projectID"
-              element={<ReportsPage />}
+              element={
+                <ReportProvider>
+                  <ReportsPage />
+                </ReportProvider>
+              }
             />
             <Route path="*" element={"Page 404"} />
           </Route>

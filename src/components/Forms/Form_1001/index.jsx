@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./index.scss";
 import Logo from "@/assets/New_Logo.png";
 import { $FormData, $Resizer } from "../../../store";
 import { useRecoilState } from "recoil";
+import { FormContext } from "../../../Apps/Aircraft_Forms/FormContext";
+import { db } from "@/Firebase";
+import { doc, getDoc } from "firebase/firestore";
+
 export default function Form_1001() {
   const makeSheetNo = (no) => {
     let L = String(no).length;
@@ -12,6 +16,10 @@ export default function Form_1001() {
     }
     final += String(no);
     return final;
+  };
+  const makeArr = (start, end) => {
+    const length = end - start + 1;
+    return Array.from({ length }, (_, i) => start + i);
   };
 
   const makeAirframeHrs = (no) => {
@@ -23,7 +31,14 @@ export default function Form_1001() {
     final += String(no);
     return final;
   };
-  const [, SetResizer] = useRecoilState($Resizer);
+
+  const {
+    setResizer: SetResizer,
+    formData,
+    activeAircraft,
+    aircraftData,
+  } = useContext(FormContext);
+
   const openResizer = (event) => {
     event.preventDefault();
     let el = event.target;
@@ -45,15 +60,53 @@ export default function Form_1001() {
     };
     SetResizer(obj);
   };
-  const [data] = useState([1, 2, 3, 4, 5]);
 
-  const [formData] = useRecoilState($FormData);
+  const [controls, setControls] = useState([]);
+  const getFormControls = async (sheetNo) => {
+    let final = [];
+    let end = sheetNo * 5;
+    let start = end - 4;
 
-  useEffect(() => {
-    if (formData.formRows.length != 0) {
-      // alert('data will be render');
-      // // document.querySelectorAll("#Form_1001 input");
+    for (let index = start; index <= end; index++) {
+      const docRef = doc(
+        db,
+        `Aircrafts/${activeAircraft}/Form_1001/${sheetNo}/Controls/`,
+        `${index}`
+      );
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        let obj = { ...docSnap.data(), id: docSnap.id };
+        final.push(obj);
+      } else {
+        break;
+      }
     }
+
+    if (final.length == 0) {
+      let arr = makeArr(start, end);
+      final = arr.map((el) => {
+        return { id: el };
+      });
+    } else {
+      let control_no = start - 1;
+      let last = start - 1;
+      let res = [];
+      for (let index = 1; index <= 5; index++) {
+        control_no = final[index - 1] ? final[index - 1].id : last;
+        if (control_no != 0 && control_no != last) {
+          res.push(final[index - 1]);
+          last = control_no;
+        } else {
+          res.push({ id: ++last });
+        }
+      }
+      final = res;
+    }
+    console.log(final);
+    setControls(final);
+  };
+  useEffect(() => {
+    getFormControls(+formData.sheet_no);
   }, []);
 
   return (
@@ -70,17 +123,22 @@ export default function Form_1001() {
         <div className="leftSection col-3 align-items-center">
           <div className="col-12 Row" style={{ border: "solid  2px black" }}>
             <label className="col-3">Type</label>
-            <input
-              className="col-9"
-              style={{ borderTop: 0, borderBottom: 0 }}
-              readOnly
-              value={"AW-149"}
-            />
+            {aircraftData.aircraft_type ? (
+              <input
+                className="col-9"
+                style={{ borderTop: 0, borderBottom: 0 }}
+                value={aircraftData.aircraft_type}
+                readOnly
+              />
+            ) : (
+              <input
+                className="col-9"
+                style={{ borderTop: 0, borderBottom: 0 }}
+              />
+            )}
           </div>
-          <div
-            className="col-12 Row d-flex justify-content-between"
-            // style={{ border: " 2px solid black" }}
-          >
+
+          <div className="col-12 Row d-flex justify-content-between">
             <div
               className="col-4 d-flex"
               style={{ border: " 2px solid black" }}
@@ -91,10 +149,19 @@ export default function Form_1001() {
               >
                 MK
               </label>
-              <input
-                className="col-8"
-                style={{ borderTopWidth: 0, borderBottomWidth: 0 }}
-              />
+              {aircraftData.mk_no ? (
+                <input
+                  className="col-8"
+                  style={{ borderTopWidth: 0, borderBottomWidth: 0 }}
+                  value={aircraftData.mk_no}
+                  readOnly
+                />
+              ) : (
+                <input
+                  className="col-8"
+                  style={{ borderTopWidth: 0, borderBottomWidth: 0 }}
+                />
+              )}
             </div>
             <div className="col-7">
               <label
@@ -103,37 +170,37 @@ export default function Form_1001() {
               >
                 S/N
               </label>
-              {formData.formInfo.aircraft_sn != null ? (
+              {activeAircraft != null ? (
                 <>
                   <input
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.aircraft_sn[0]}
+                    value={activeAircraft.split("")[0]}
                   />
                   <input
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.aircraft_sn[1]}
+                    value={activeAircraft.split("")[1]}
                   />
                   <input
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.aircraft_sn[2]}
+                    value={activeAircraft.split("")[2]}
                   />
                   <input
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.aircraft_sn[3]}
+                    value={activeAircraft.split("")[3]}
                   />
                   <input
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.aircraft_sn[4]}
+                    value={activeAircraft.split("")[4]}
                     style={{ borderRightWidth: "2px" }}
                   />
                 </>
@@ -166,28 +233,28 @@ export default function Form_1001() {
               >
                 Sheet No
               </label>
-              {formData.formInfo.sheet_no != null ? (
+              {formData.sheet_no ? (
                 <>
                   <input
                     type="text"
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.sheet_no[0]}
+                    value={formData.sheet_no.split("")[0]}
                   />
                   <input
                     type="text"
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.sheet_no[1]}
+                    value={formData.sheet_no.split("")[1]}
                   />
                   <input
                     type="text"
                     className="col-2"
                     maxLength="1"
                     readOnly
-                    value={formData.formInfo.sheet_no[2]}
+                    value={formData.sheet_no.split("")[2]}
                   />
                   <input
                     type="text"
@@ -195,7 +262,7 @@ export default function Form_1001() {
                     maxLength="1"
                     style={{ borderRightWidth: "2px" }}
                     readOnly
-                    value={formData.formInfo.sheet_no[3]}
+                    value={formData.sheet_no.split("")[3]}
                   />
                 </>
               ) : (
@@ -226,7 +293,7 @@ export default function Form_1001() {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, index) => {
+            {controls.map((row, index) => {
               return (
                 <tr key={index}>
                   <td className="col-2 p-0">
@@ -234,10 +301,10 @@ export default function Form_1001() {
                       className="col-12 cNo d-flex justify-content-between p-0"
                       style={{ fontSize: "10px" }}
                     >
-                      <label className="col-4 py-1">{}</label>
+                      <label className="col-4 py-1">Control No</label>
                       <div className="col-7 d-flex">
-                        {formData.formRows[index] ? (
-                          makeSheetNo(+formData.formRows[index].control_no)
+                        {row.id ? (
+                          makeSheetNo(+row.id)
                             .split("")
                             .map((el, index) => {
                               return (
@@ -295,31 +362,30 @@ export default function Form_1001() {
                         Originator’s Printed Name
                       </label>
                       <div className="col-12 p-0">
-                        {formData.formRows[index] ? (
+                        {row.originator_name ? (
                           <input
                             className="col-12"
                             style={{
-                              height: "40px",
+                              height: "46px",
                               textAlign: "center",
                               border: 0,
                               fontSize: "1rem",
                             }}
                             readOnly
-                            value={formData.formRows[index].originator_name}
+                            value={row.originator_name}
                             disabled={true}
                           />
                         ) : (
                           <input
                             className="col-12"
                             style={{
-                              height: "40px",
+                              height: "46px",
                               textAlign: "center",
                               border: 0,
                               fontSize: "1rem",
                             }}
                           />
                         )}
-                        {/* <input className="col-12" style={{ height: "48px", textAlign: "center", border: 0, fontSize: "1rem" }} /> */}
                       </div>
                     </div>
                     <div
@@ -330,7 +396,7 @@ export default function Form_1001() {
                       }}
                     >
                       <label className="py-1">1002</label>
-                      <input type="checkbox" />
+                      <input type="checkbox" defaultChecked={row.has_1002} />
                     </div>
                   </td>
                   <td className="col-6 p-0">
@@ -352,7 +418,7 @@ export default function Form_1001() {
                             Date
                           </label>
                           <div className="col-8 d-flex">
-                            {formData.formRows[index] ? (
+                            {row.control_date ? (
                               <>
                                 <input
                                   className="col-2"
@@ -360,9 +426,17 @@ export default function Form_1001() {
                                   maxLength="1"
                                   readOnly
                                   value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[2]
-                                      .split("")[0]
+                                    row.control_date.split("-")[2].split("")[0]
+                                  }
+                                />
+
+                                <input
+                                  className="col-2"
+                                  style={{ borderTop: 0, borderBottom: 0 }}
+                                  maxLength="1"
+                                  readOnly
+                                  value={
+                                    row.control_date.split("-")[2].split("")[1]
                                   }
                                 />
                                 <input
@@ -371,9 +445,7 @@ export default function Form_1001() {
                                   maxLength="1"
                                   readOnly
                                   value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[2]
-                                      .split("")[1]
+                                    row.control_date.split("-")[1].split("")[0]
                                   }
                                 />
                                 <input
@@ -382,9 +454,7 @@ export default function Form_1001() {
                                   maxLength="1"
                                   readOnly
                                   value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[1]
-                                      .split("")[0]
+                                    row.control_date.split("-")[1].split("")[1]
                                   }
                                 />
                                 <input
@@ -393,20 +463,7 @@ export default function Form_1001() {
                                   maxLength="1"
                                   readOnly
                                   value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[1]
-                                      .split("")[1]
-                                  }
-                                />
-                                <input
-                                  className="col-2"
-                                  style={{ borderTop: 0, borderBottom: 0 }}
-                                  maxLength="1"
-                                  readOnly
-                                  value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[0]
-                                      .split("")[2]
+                                    row.control_date.split("-")[0].split("")[2]
                                   }
                                 />
                                 <input
@@ -418,9 +475,7 @@ export default function Form_1001() {
                                   }}
                                   readOnly
                                   value={
-                                    formData.formRows[index].log_date
-                                      .split("-")[0]
-                                      .split("")[3]
+                                    row.control_date.split("-")[0].split("")[3]
                                   }
                                   maxLength="1"
                                 />
@@ -518,7 +573,7 @@ export default function Form_1001() {
                         Symptom / Work Required:
                       </label>
 
-                      {formData.formRows[index] ? (
+                      {row.work_required ? (
                         <textarea
                           className="col-12"
                           style={{
@@ -529,7 +584,7 @@ export default function Form_1001() {
                             borderLeftWidth: 0,
                             borderRightWidth: 0,
                           }}
-                          value={formData.formRows[index].work_required}
+                          value={row.work_required}
                           readOnly
                         ></textarea>
                       ) : (
@@ -549,13 +604,13 @@ export default function Form_1001() {
                   </td>
                   <td className="col-4 p-0">
                     <div className="col-12 d-flex flex-wrap">
-                      {formData.formRows[index] ? (
+                      {row.work_done ? (
                         <textarea
                           className="col-12"
                           readOnly
-                          value={formData.formRows[index].action_taken}
+                          value={row.work_done}
                           style={{
-                            height: "72px",
+                            height: "88px",
                             resize: "none",
                             border: 0,
                             borderBottom: " 2px solid black",
@@ -565,7 +620,7 @@ export default function Form_1001() {
                         <textarea
                           className="col-12"
                           style={{
-                            height: "72px",
+                            height: "88px",
                             resize: "none",
                             border: 0,
                             borderBottom: " 2px solid black",
@@ -579,7 +634,7 @@ export default function Form_1001() {
                         <p className="col-5 p-2 mb-0">
                           Supervisor Printed Name:
                         </p>
-                        {formData.formRows[index] ? (
+                        {row.supervisor_name ? (
                           <input
                             className="col-7 text-center"
                             style={{
@@ -589,7 +644,7 @@ export default function Form_1001() {
                             }}
                             disabled={true}
                             readOnly
-                            value={formData.formRows[index].supervisor_name}
+                            value={row.supervisor_name}
                           />
                         ) : (
                           <input

@@ -30,6 +30,7 @@ import Modal_add_connector_to_aircraft from "@/Apps/Avionics/componetns/Modal_ad
 import Modal_aircraft_connectos from "@/Apps/Avionics/componetns/Modal_aircraft_connectos.jsx";
 
 import { MenuProvider } from "@/Apps/Projects/ProjectsContext";
+import { FormProvider } from "@/Apps/Aircraft_Forms/FormContext";
 // Code Start Here
 export default function HomePage() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function HomePage() {
   const [tokenCheck, setTokenCheck] = useState();
   const [server] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
-  const [userInfo, setUserInfo] = useRecoilState($User_Info);
+  const [, setUserInfo] = useRecoilState($User_Info);
   const checkUserToken = () => {
     axios
       .get(`${server}/php/index.php/api/auth/check`, {
@@ -74,7 +75,11 @@ export default function HomePage() {
           {/* Apps */}
           {activeTab == 1 ? <Warehouse /> : null}
           {activeTab == 2 ? <Avionics /> : null}
-          {activeTab == 3 ? <Aircraft_Forms /> : null}
+          {activeTab == 3 ? (
+            <FormProvider>
+              <Aircraft_Forms />
+            </FormProvider>
+          ) : null}
           {activeTab == 4 ? <Retrofit_Data /> : null}
           {activeTab == 5 ? (
             <MenuProvider>

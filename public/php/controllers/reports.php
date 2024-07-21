@@ -2,6 +2,7 @@
 $endpoints += [
     '/api/reports/1/\d+' => 'report_1',
     '/api/reports/2/\d+' => 'report_2',
+    '/api/partdetails/\d+' => 'details_report'
 ];
 
 function report_1($id)
@@ -49,6 +50,9 @@ function report_1($id)
                 }
 
                 $Row = [
+                    'part_id' => $part_id,
+                    'recorded_s_id' => $recorded_s_id,
+                    'recorded_a_id' => $recorded_a_id,
                     'aircraft_sn' => $aircraft_SN,
                     'template_s_id' => $template_s_id,
                     'template_a_id' => $template_a_id,
@@ -63,6 +67,41 @@ function report_1($id)
                     'done_duration_a' => $recorded_a_duration,
                 ];
                 array_push($data, $Row);
+            }
+            $response['err'] = false;
+            $response['msg'] = "All Status are ready to view !";
+            $response['data'] = $data;
+        } else {
+            $response['msg'] = "There are no Status found !";
+        }
+    } catch (Exception $e) {
+        $response['msg'] = "An error occurred: " . $e->getMessage();
+    }
+    echo json_encode($response, true);
+}
+
+function details_report($id)
+{
+    $url = $id[0];
+    $part_id = explode("/api/partdetails/", $url)[1];
+    global $pdo, $response;
+    try {
+        $sql = "SELECT * FROM project_tasks WHERE 
+        task_status_id != 4 AND 
+        task_status_id != 5 AND 
+        tasklist_id = :part_id 
+        ORDER BY level_1,level_2,level_3";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(':part_id', $part_id);
+        $statement->execute();
+        $data = [];
+        if ($statement->rowCount() > 0) {
+            while ($el = $statement->fetch(PDO::FETCH_ASSOC)) {
+                $task_id = $el['task_id'];
+                $task_status_id = $el['task_status_id'];
+                $el['comments'] = getRows("task_comments", "task_id = $task_id");
+                $el['task_status_name'] = getOneField("project_status", "status_name", "status_id = $task_status_id");
+                array_push($data, $el);
             }
             $response['err'] = false;
             $response['msg'] = "All Status are ready to view !";

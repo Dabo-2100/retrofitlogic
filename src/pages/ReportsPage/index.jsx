@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./index.scss";
 import axios from "axios";
 import { useRecoilState } from "recoil";
@@ -18,9 +18,11 @@ import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS2, ArcElement } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import ProgressBar from "@/Apps/Projects/components/ProgressBar";
+import { ReportContext } from "./ReportContext";
+import PartDetails from "./Modals/PartDetails";
 
 export default function ReportsPage() {
-  
+  const { detailsModal, setDetailsModal } = useContext(ReportContext);
   const setRandomColor = () => {
     return (
       "#" +
@@ -195,6 +197,7 @@ export default function ReportsPage() {
         setChart1_data(obj);
         // console.log(finalArr);
         setReportData(finalArr);
+        console.log(finalArr);
       })
       .catch((err) => {
         console.log(err);
@@ -268,7 +271,6 @@ export default function ReportsPage() {
                         {reportData[modalIndex]["total_duration"]} Hrs
                       </td>
                     </tr>
-
                     <tr>
                       <th className="bg-secondary text-white">
                         Leonardo Issued Duration
@@ -282,7 +284,6 @@ export default function ReportsPage() {
                         Hrs
                       </td>
                     </tr>
-
                     <tr>
                       <th className="bg-secondary text-white">
                         Actual Work Duration
@@ -370,16 +371,77 @@ export default function ReportsPage() {
                                     +part.structure_duration) *
                                   100
                                 ).toFixed(2)
-                              )
-                                ? "-"
-                                : (
+                              ) ? (
+                                "-"
+                              ) : (
+                                <p>
+                                  {(
                                     (+part.done_duration_s /
                                       +part.structure_duration) *
                                     100
                                   ).toFixed(2) + " %"}
-                            </th>
 
+                                  {part.done_duration_s != 0 ? (
+                                    <span
+                                      style={{
+                                        textDecoration: "underline",
+                                        cursor: "pointer",
+                                        marginLeft: "10px",
+                                        fontSize: "12px",
+                                        color: "blue",
+                                      }}
+                                      onClick={() => {
+                                        setDetailsModal({
+                                          index: true,
+                                          part_id: part.recorded_s_id,
+                                        });
+                                      }}
+                                    >
+                                      remain details
+                                    </span>
+                                  ) : null}
+                                </p>
+                              )}
+                            </th>
                             <th className="text-success">
+                              {isNaN(
+                                (
+                                  (+part.done_duration_a /
+                                    +part.avionics_duration) *
+                                  100
+                                ).toFixed(2)
+                              ) ? (
+                                "-"
+                              ) : (
+                                <p>
+                                  {(
+                                    (+part.done_duration_a /
+                                      +part.avionics_duration) *
+                                    100
+                                  ).toFixed(2) + " %"}
+
+                                  {part.done_duration_a != 0 ? (
+                                    <span
+                                      style={{
+                                        textDecoration: "underline",
+                                        cursor: "pointer",
+                                        marginLeft: "10px",
+                                        fontSize: "12px",
+                                        color: "blue",
+                                      }}
+                                      onClick={() => {
+                                        setDetailsModal({
+                                          index: true,
+                                          part_id: part.recorded_a_id,
+                                        });
+                                      }}
+                                    >
+                                      remain tasks
+                                    </span>
+                                  ) : null}
+                                </p>
+                              )}
+                              {/* 
                               {isNaN(
                                 (
                                   (+part.done_duration_a /
@@ -392,7 +454,7 @@ export default function ReportsPage() {
                                     (+part.done_duration_a /
                                       +part.avionics_duration) *
                                     100
-                                  ).toFixed(2) + " %"}
+                                  ).toFixed(2) + " %"} */}
                             </th>
                           </tr>
                         </React.Fragment>
@@ -461,6 +523,8 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
+
+      {detailsModal.index ? <PartDetails /> : null}
     </div>
   );
 }

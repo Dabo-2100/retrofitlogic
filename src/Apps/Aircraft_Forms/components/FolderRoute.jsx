@@ -1,226 +1,152 @@
 import { useRecoilState } from "recoil";
-import { $Server, $Token, $ActiveModal, $ActiveForm, $openedAircraft_id, $LoaderIndex, $FormData, $openedForm } from "@/store";
-import { useEffect, useState } from "react";
+import { $openedAircraft_id, $LoaderIndex } from "@/store";
+import { useContext, useEffect, useState } from "react";
 import icon1001 from "@/assets/1001_icon.png";
-import icon1002 from "@/assets/1002_icon.png";
-import icon1003 from "@/assets/1003_icon.png";
-import icon1004 from "@/assets/1004_icon.png";
-import newDocIcon from "@/assets/new-document.png"
+import newDocIcon from "@/assets/new-document.png";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { db } from "@/Firebase";
+import { collection, getDocs, query, setDoc, doc } from "firebase/firestore";
+import { $ActiveForm, $ActiveModal } from "@/store";
+import { FormContext } from "../FormContext";
 
 export default function FolderRoute() {
-    const [Server_Url] = useRecoilState($Server);
-    const [token] = useRecoilState($Token);
-    const [aircraft_id] = useRecoilState($openedAircraft_id);
-    const [, setLoaderIndex] = useRecoilState($LoaderIndex);
-    const [, setFormData] = useRecoilState($FormData);
-    const [, setActiveModal] = useRecoilState($ActiveModal);
-    const [, setActiveForm] = useRecoilState($ActiveForm);
-    const [, setOpenForm] = useRecoilState($openedForm);
-
-    const [folderNo] = useState(6);
-    const [formTypes, setFormTypes] = useState([]);
-    const [allForms, setAllForms] = useState([]);
-    const [formsToView, setFormsToView] = useState([]);
-
-    function groupBy(array, property) {
-        return array.reduce((groups, item) => {
-            const value = item[property];
-            if (!groups[value]) {
-                groups[value] = [];
-            }
-            groups[value].push(item);
-            return groups;
-        }, {});
+  // Utlities
+  const makeSheetNo = (no) => {
+    let L = String(no).length;
+    let final = "";
+    for (let index = 0; index < 4 - L; index++) {
+      final += "0";
     }
+    final += String(no);
+    return final;
+  };
+  const sortNumbers = (arr) => {
+    return arr.sort((a, b) => a - b);
+  };
+  const makeArr = (start, end) => {
+    const length = end - start + 1;
+    return Array.from({ length }, (_, i) => start + i);
+  };
+  // States
+  const {
+    activeAircraft: aircraft_id,
+    setActiveModal: setOpenModal,
+    setActiveForm: setOpenForm,
+    forms1001,
+    setForms1001,
+    setFormData,
+  } = useContext(FormContext);
 
-    function makeArray(no) {
-        let res = [];
-        for (let index = 0; index < no; index++) {
-            res.push(index + 1);
-        }
-        return res;
+  const [formsToView, setFormsToView] = useState([]);
+  const [viewPerPage, setViewPerPage] = useState(5);
+  const [pagesArr, setPagesArr] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // Functions
+  const get1001Forms = async (aircraft_id) => {
+    const Sheets = [];
+    const querySnapshot = await getDocs(
+      query(collection(db, `Aircrafts/${aircraft_id}/Form_1001`))
+    );
+    querySnapshot.forEach((doc) => {
+      Sheets.push(makeSheetNo(doc.id));
+    });
+    setForms1001(sortNumbers(Sheets));
+    setFormsToView(Sheets.slice(0, viewPerPage));
+  };
+
+  let addData = async () => {
+    try {
+      const docRef = await setDoc(doc(db, "Aircrafts", "49064/Form_1001/10"), {
+        aircraft_type: "AW-149",
+        mk_no: 12,
+        is_active: true,
+        sheet_no: "0003",
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
     }
-
-    function makeSheetNo(no) {
-        let L = String(no).length;
-        let final = "";
-        for (let index = 0; index < (4 - L); index++) {
-            final += "0";
-        }
-        final += String(no);
-        return final;
-    }
-
-    const getAircraftForms = (aircraft_id) => {
-        setLoaderIndex(1);
-        axios.get(`${Server_Url}/php/index.php/api/aircrafts/${aircraft_id}/forms`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        }).then((res) => {
-            if (res.data.err == false) {
-                let x = res.data.data;
-                let y = groupBy(x, 'type_name');
-                let z = Object.keys(y);
-                let final = [];
-                z.forEach((type) => {
-                    let p = Math.ceil(y[type].length / folderNo);
-                    let obj = {
-                        name: type,
-                        pages: makeArray(p),
-                        activeIndex: 0,
-                    }
-                    final.push(obj);
-                })
-                setFormTypes(final);
-                setAllForms(y);
-                setFormsToView(y);
-                setTimeout(() => {
-                    setLoaderIndex(0);
-                }, 500);
-            }
-            else {
-                Swal.fire({
-                    icon: "info",
-                    text: "There is no forms here",
-                    timer: 1500,
-                })
-                setTimeout(() => {
-                    setLoaderIndex(0);
-                }, 500);
-            }
-        }).catch((err) => {
-            Swal.fire({
-                icon: "Error",
-                text: "Connection Error !",
-                timer: 1500,
-            })
-        });
-
-    }
-
-    const createNewForm = (form_type) => {
-        alert('create' + allForms[form_type][0].form_type_id);
-    }
-
-    const chagePage = (form_type, toPage) => {
-        let oldView = { ...formsToView };
-        let y = allForms[form_type].slice(((toPage - 1) * folderNo), (toPage * folderNo))
-        oldView[form_type] = y;
-        setFormsToView(oldView);
-        // console.log(allForms);
-
-    }
-
-    const openFormDetails = (form_id, sheetNo, form_type) => {
-        let formObj = {
-            form_id: form_id,
-            form_type: form_type,
-        }
-        setOpenForm(formObj);
-        axios.get(`${Server_Url}/php/index.php/api/forms/${form_id}/logs`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        }).then((res) => {
-            if (res.data.err == false) {
-                let dataObj = {
-                    formInfo: {
-                        sheet_no: sheetNo,
-                        aircraft_sn: "49064"
-                    },
-                    formRows: res.data.data,
-                }
-                setFormData(dataObj);
-                setActiveModal(1000);
-                if (form_type == 1) {
-                    setActiveForm(1001);
-                }
-                else if (form_type == 2) {
-                    setActiveForm(1002);
-                }
-                else if (form_type == 3) {
-                    setActiveForm(1003);
-                }
-            }
-            else {
-                // console.log(res.data);
-                Swal.fire({
-                    icon: "error",
-                    text: "There is no logs here",
-                    timer: 1000,
-                })
-            }
-        }).catch((err) => {
-            console.log(err);
-        });
-    }
-
-    useEffect(() => {
-        getAircraftForms(aircraft_id);
-    }, []);
-
-    return (
-        <div className="col-12 d-flex flex-wrap gap-3" id="FolderRoute">
-            {
-                formTypes.map((type, index) => {
-                    return (
-                        <div className="formType col-12" key={index}>
-
-                            <div className="col-12 d-flex align-items-center justify-content-between mb-2 gap-2">
-                                <h1 className="typeHeader">{type.name}</h1>
-                                <div className="d-flex align-items-center gap-3">
-                                    <div
-                                        className="p-3"
-                                        onClick={() => { createNewForm(type.name) }}
-                                        style={{ backgroundColor: "#1f2935", cursor: "pointer", borderRadius: "50%" }}
-                                    >
-                                        <img src={newDocIcon} width={25} />
-                                    </div>
-                                    <input type="search" placeholder={`Search ${type.name} ...`} />
-                                </div>
-                            </div>
-
-                            <div className="col-12 formsContainer">
-                                {
-                                    formsToView[type.name].map((sheet, index) => {
-                                        if (index + 1 <= folderNo) {
-                                            return (
-                                                <div key={index} className={`folder`} onClick={() => {
-                                                    openFormDetails(sheet.form_id, makeSheetNo(sheet.form_order), sheet.form_type_id);
-                                                    // console.log(sheet)
-                                                }}>
-                                                    <img src={
-                                                        type == 'Form 1001' ? icon1001 :
-                                                            type == 'Form 1002' ? icon1002 :
-                                                                type == 'Form 1003' ? icon1003 :
-                                                                    icon1004
-                                                    } />
-                                                    <p>{makeSheetNo(sheet.form_order)}</p>
-                                                </div>
-                                            )
-
-                                        }
-                                    })
-                                }
-                                <div className="col-12 pagination d-flex justify-content-center gap-2">
-                                    {
-                                        type.pages.length > 1 ? (
-                                            type.pages.map((page, index) => {
-                                                return (<button onClick={() => { chagePage(type.name, page); }} key={index} className={`btn btn-${type.activeIndex == index ? 'info' : 'primary'}`}>{page}</button>)
-                                            })
-
-                                        ) : null
-                                    }
-                                </div>
-                            </div>
-                            <hr className="col-12" />
-                        </div>
-                    )
-                })
-            }
+  };
+  // Use()
+  useEffect(() => {
+    get1001Forms(aircraft_id);
+  }, []);
+  useEffect(() => {
+    setCurrentPage(1);
+    let end = currentPage * viewPerPage;
+    let start = end - viewPerPage;
+    setFormsToView(forms1001.slice(start, end));
+    setPagesArr(makeArr(1, Math.ceil(forms1001.length / viewPerPage)));
+  }, [viewPerPage]);
+  useEffect(() => {
+    let end = currentPage * viewPerPage;
+    let start = end - viewPerPage;
+    setFormsToView(forms1001.slice(start, end));
+  }, [currentPage]);
+  // Return
+  return (
+    <div className="col-12 d-flex flex-wrap gap-3" id="FolderRoute">
+      {/* <=========================== Actions ============================> */}
+      <div className="col-12 d-flex justify-content-between text-white">
+        <div className="d-flex align-items-center">
+          <p className="">View Reslut / Page</p>
+          <select
+            defaultValue={5}
+            onChange={(event) => {
+              setViewPerPage(event.target.value);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={100}>100</option>
+          </select>
         </div>
-    )
+        <div
+          className="d-flex align-items-center"
+          onClick={() => {
+            setFormData({ sheet_no: makeSheetNo(forms1001.length + 1) });
+            setOpenModal(1000);
+            setOpenForm(1001);
+          }}
+        >
+          <img height={30} src={newDocIcon} />
+        </div>
+      </div>
+      {/* <=========================== Content ============================> */}
+      <div className="col-12 d-flex gap-1 align-items-center">
+        {formsToView.map((el, index) => {
+          return (
+            <div
+              key={index}
+              className="d-flex flex-column text-white align-items-center"
+              onClick={() => {
+                setFormData({ sheet_no: makeSheetNo(el) });
+                setOpenModal(1000);
+                setOpenForm(1001);
+              }}
+            >
+              <img src={icon1001} height={100} />
+              <p>{makeSheetNo(el)}</p>
+            </div>
+          );
+        })}
+      </div>
+      {/* <=========================== Pagination ============================> */}
+      <div className="col-12 d-flex gap-1 align-items-center align-content-center">
+        {pagesArr.map((el, index) => {
+          return (
+            <button
+              key={index}
+              onClick={() => setCurrentPage(el)}
+              className={`btn ${
+                el == currentPage ? "btn-primary" : "btn-info"
+              }`}
+            >
+              {el}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
