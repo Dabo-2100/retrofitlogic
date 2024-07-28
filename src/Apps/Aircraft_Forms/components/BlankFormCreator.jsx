@@ -46,10 +46,13 @@ export default function BlankFormCreator() {
   //   const [, setActiveModal] = useRecoilState($ActiveModal);
   //   const [, setActiveForm] = useRecoilState($ActiveForm);
   //   const [, setFormData] = useRecoilState($FormData);
-  const { setActiveForm, setActiveModal } = useContext(FormContext);
+  const { setActiveForm, setActiveModal, setFormData, setActiveAircraft } =
+    useContext(FormContext);
   const openForm = (formNo) => {
+    setFormData({ sheet_no: "0001" });
     setActiveModal(1000);
     setActiveForm(formNo);
+    setActiveAircraft(null);
   };
   return (
     <div className="col-12 d-flex flex-wrap justify-content-center">

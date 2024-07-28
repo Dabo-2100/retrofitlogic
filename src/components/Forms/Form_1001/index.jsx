@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import "./index.scss";
 import Logo from "@/assets/New_Logo.png";
-import { $FormData, $Resizer } from "../../../store";
-import { useRecoilState } from "recoil";
-import { FormContext } from "../../../Apps/Aircraft_Forms/FormContext";
+import { FormContext } from "@/Apps/Aircraft_Forms/FormContext";
 import { db } from "@/Firebase";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -62,6 +60,7 @@ export default function Form_1001() {
   };
 
   const [controls, setControls] = useState([]);
+
   const getFormControls = async (sheetNo) => {
     let final = [];
     let end = sheetNo * 5;
@@ -104,6 +103,9 @@ export default function Form_1001() {
     }
     console.log(final);
     setControls(final);
+  };
+  const open1002 = (control_no) => {
+    alert(`i will open ${control_no} and i'm Sheet ${+formData.sheet_no}`);
   };
   useEffect(() => {
     getFormControls(+formData.sheet_no);
@@ -395,7 +397,14 @@ export default function Form_1001() {
                         borderTop: " 2px solid black",
                       }}
                     >
-                      <label className="py-1">1002</label>
+                      <label
+                        className="py-1"
+                        onClick={() => {
+                          open1002(+row.id);
+                        }}
+                      >
+                        1002
+                      </label>
                       <input type="checkbox" defaultChecked={row.has_1002} />
                     </div>
                   </td>

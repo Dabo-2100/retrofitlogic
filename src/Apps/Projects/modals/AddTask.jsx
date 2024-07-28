@@ -9,7 +9,7 @@ import {
 } from "../components/customHooks";
 import axios from "axios";
 import { useRecoilState } from "recoil";
-import { $Server, $Token } from "../../../store";
+import { $Server, $Token } from "@/store";
 import Swal from "sweetalert2";
 export default function AddTask() {
   const { closeModal, project_id, list_id } = useContext(ProjectsContext);
