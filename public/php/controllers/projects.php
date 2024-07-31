@@ -12,11 +12,14 @@ $endpoints += [
     '/api/projects/\d+/tasklists/\d+/tasks' => 'index_tasks',
     '/api/tasklists/\d+/tasks' => 'index_tasks',
     '/api/tasklists/istemplate' => 'index_templates',
-    '/api/tasks/store' => 'store_task',
+
     '/api/tasks/\d+/switch' => 'switch_task',
     '/api/sb_tasks' => 'index_sbtasks',
     '/api/tasks/\d+/comments' => 'index_comments',
     '/api/tasks/\d+/redescr' => 'update_desc',
+    '/api/tasks/check' => 'check_taskname',
+    '/api/tasks/check' => 'check_taskname',
+    '/api/tasks/store' => 'store_task',
 ];
 
 function index_status()
@@ -64,6 +67,7 @@ function index_status()
         echo 'Method Not Allowed';
     }
 }
+
 function index_types()
 {
     global $pdo, $response, $method;
@@ -164,7 +168,71 @@ function store_project()
 
 function store_task()
 {
-    insert_data();
+    global $pdo, $response, $POST_data, $method;
+    if ($method === "POST") {
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $headerParts = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+            if (count($headerParts) == 2 && $headerParts[0] == 'Bearer') {
+                $accessToken = $headerParts[1];
+                $user_info = json_decode(checkToken($accessToken), true);
+                if ($user_info) {
+                    try {
+                        $task_name = $POST_data['task_name'];
+                        $task_desc = $POST_data['task_desc'];
+                        $task_progress = $POST_data['task_progress'];
+                        $task_status_id = $POST_data['task_status_id'];
+                        $task_duration = $POST_data['task_duration'];
+                        $tasklist_id = $POST_data['tasklist_id'];
+                        $tasklist_name = getOneField("project_tasklists", "tasklist_name", "tasklist_id = $tasklist_id");
+                        $teamplte_id  = getOneField("project_tasklists", "tasklist_id", "tasklist_name = '$tasklist_name' AND is_template = true");
+
+                        $levels = '';
+                        $levelsVal = '';
+                        $splitLevelts = explode(".", $task_name);
+                        foreach ($splitLevelts as $index => $value) {
+                            $levels .= 'level_' . ($index + 1);
+                            $levelsVal .=  $value;
+
+                            if ($index != count($splitLevelts) - 1) {
+                                $levels .= ",";
+                                $levelsVal .= ",";
+                            }
+                        }
+
+                        $sql = "INSERT INTO project_tasks 
+                        (task_name,task_desc,tasklist_id,task_progress,task_status_id,task_duration,$levels) VALUES 
+                        ('$task_name','$task_desc',$tasklist_id,$task_progress,$task_status_id,$task_duration,$levelsVal)";
+                        $statement = $pdo->prepare($sql);
+                        $statement->execute();
+
+                        $sql2 = "INSERT INTO project_tasks 
+                        (task_name,task_desc,tasklist_id,task_progress,task_status_id,task_duration,$levels) VALUES 
+                        ('$task_name','$task_desc',$teamplte_id,$task_progress,$task_status_id,$task_duration,$levelsVal)";
+                        $statement2 = $pdo->prepare($sql2);
+                        $statement2->execute();
+
+                        reOrderTasklist($tasklist_id);
+                        reOrderTasklist($teamplte_id);
+                        $response['err'] = false;
+                        $response['msg'] = "All Tasks Added !";
+                    } catch (Exception $e) {
+                        $response['msg'] = "An error occurred: " . $e->getMessage();
+                    }
+                } else {
+                    $response['msg'] = "Invaild user token !";
+                }
+                echo json_encode($response, true);
+            } else {
+                http_response_code(400);
+                echo "Error : 400 | Bad Request";
+            }
+        } else {
+            http_response_code(401); // Unauthorized
+            echo "Error : 401 | Unauthorized";
+        }
+    } else {
+        echo 'Method Not Allowed';
+    }
 }
 
 function delete_project()
@@ -702,10 +770,10 @@ function switch_task($id)
                         $statement2->bindParam(':task_name', $task_name);
                         $statement2->execute();
 
-                        reOrderFromTasklist($tasklist_id);
-                        reOrderFromTasklist($new_tasklist_id);
-                        reOrderFromTasklist($template_tasklist_id);
-                        reOrderFromTasklist($new_template_id);
+                        reOrderTasklist($tasklist_id);
+                        reOrderTasklist($new_tasklist_id);
+                        reOrderTasklist($template_tasklist_id);
+                        reOrderTasklist($new_template_id);
 
                         $response['err'] = false;
                         $response['msg'] = "Task Change Department Succesfuly !";
@@ -729,9 +797,7 @@ function switch_task($id)
     }
 };
 
-
-
-function reOrderFromTasklist($tasklist_id)
+function reOrderTasklist($tasklist_id)
 {
     global $pdo;
     if (is_null($tasklist_id) != 1) {
@@ -748,12 +814,10 @@ function reOrderFromTasklist($tasklist_id)
                 $statement3 = $pdo->prepare($sql3);
                 $statement3->execute();
                 $index = $new;
-                echo $index;
             }
         }
     }
 }
-
 
 function update_desc($id)
 {
@@ -802,14 +866,60 @@ function update_desc($id)
                             $statement2 = $pdo->prepare($sql2);
                             $statement2->execute();
 
-                            reOrderFromTasklist($tasklist_id);
-                            reOrderFromTasklist($template_tasklist_id);
+                            reOrderTasklist($tasklist_id);
+                            reOrderTasklist($template_tasklist_id);
                         }
 
                         $response['err'] = false;
                         $response['msg'] = "Task desc updated Succesfuly !";
                     } catch (Exception $e) {
                         // echo "Error Happend";
+                    }
+                } else {
+                    $response['msg'] = "Invaild user token !";
+                }
+                echo json_encode($response, true);
+            } else {
+                http_response_code(400);
+                echo "Error : 400 | Bad Request";
+            }
+        } else {
+            http_response_code(401); // Unauthorized
+            echo "Error : 401 | Unauthorized";
+        }
+    } else {
+        echo 'Method Not Allowed';
+    }
+}
+
+function check_taskname()
+{
+    global $pdo, $response, $POST_data, $method;
+    if ($method === "POST") {
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $headerParts = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+            if (count($headerParts) == 2 && $headerParts[0] == 'Bearer') {
+                $accessToken = $headerParts[1];
+                $user_info = json_decode(checkToken($accessToken), true);
+                if ($user_info) {
+                    $task_name = $POST_data['task_name'];
+                    $tasklist_id = $POST_data['tasklist_id'];
+                    $tasklist_name = getOneField("project_tasklists", "tasklist_name", "tasklist_id = $tasklist_id");
+                    $sb_name = explode(" [ ", $tasklist_name)[0];
+                    $allTasklists = getRows("project_tasklists", "tasklist_name LIKE '%$sb_name%'");
+                    $TotalChecks = 0;
+                    foreach ($allTasklists as $index => $list) {
+                        $tasklist_id = $list['tasklist_id'];
+                        $taskFound = getRows("project_tasks", "task_name = '$task_name' AND tasklist_id = $tasklist_id");
+                        if (count($taskFound) > 0) {
+                            $TotalChecks++;
+                        }
+                    }
+                    if ($TotalChecks == 0) {
+                        $response['err'] = false;
+                        $response['msg'] = "This Name is Accepted";
+                    } else {
+                        $response['msg'] = "This Name is Not Accepted";
                     }
                 } else {
                     $response['msg'] = "Invaild user token !";

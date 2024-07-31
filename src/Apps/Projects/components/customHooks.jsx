@@ -5,6 +5,7 @@ import { $Server, $Token } from "@/store";
 
 let status = [];
 let commentTypes = [];
+let aircraftFleet = [];
 
 export const getTodayDate = () => {
   const now = new Date();
@@ -168,4 +169,30 @@ export const getDueDate = (startDatetime, durationHours) => {
     now.getHours() < 10 ? `0${now.getHours()}` : now.getHours()
   }:${now.getMinutes() < 10 ? `0${now.getMinutes()}` : now.getMinutes()}`;
   return final;
+};
+
+export const useAircraftFleet = () => {
+  const [Server_Url] = useRecoilState($Server);
+  const [token] = useRecoilState($Token);
+  const [res, setRes] = useState([]);
+  useEffect(() => {
+    if (aircraftFleet.length == 0) {
+      axios
+        .get(`${Server_Url}/php/index.php/api/aircrafts`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setRes(res.data.data);
+          aircraftFleet = res.data.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setRes(aircraftFleet);
+    }
+  }, []);
+  return res;
 };

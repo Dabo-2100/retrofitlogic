@@ -138,9 +138,9 @@ export default function ProjectsList() {
       <header className="col-12 d-flex justify-content-between">
         <h1 className="header fs-5 mb-1">All Projects</h1>
         <div className="actions">
-          {/* <button className="btn btn-success" onClick={() => openModal(1)}>
+          <button className="btn btn-success" onClick={() => openModal(1)}>
             New Project
-          </button> */}
+          </button>
         </div>
       </header>
       <table className="col-12 table table-bordered table-dark">

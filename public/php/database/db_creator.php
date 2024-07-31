@@ -376,6 +376,8 @@ $statements = [
     'CREATE TABLE IF NOT EXISTS app_projects( 
         project_id              INT(20) AUTO_INCREMENT PRIMARY KEY,
         project_name            VARCHAR(255),
+        project_type_id         INT,
+        FOREIGN KEY (project_type_id) REFERENCES project_types(type_id),
         project_status_id       INT,
         FOREIGN KEY (project_status_id) REFERENCES project_status(status_id),
         project_start_date      DATE,

@@ -57,12 +57,12 @@ export const $HomeTabs = atom({
     },
     {
       id: 4,
-      name: "Retrofit Data",
+      name: "Data Collector",
       icon: faDatabase,
     },
     {
       id: 5,
-      name: "Projects",
+      name: "Project Manager",
       icon: faCalendarDays,
     },
     {

@@ -252,6 +252,7 @@ export default function ProjectDetails() {
             </thead>
           </table>
           {view.map((tasklist, index) => {
+            // console.log(tasklist.tasklist_id);
             return (
               <div
                 key={tasklist.tasklist_id}

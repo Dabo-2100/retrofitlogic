@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ProjectsContext } from "../ProjectsContext";
 import {
   useAllTeams,
@@ -9,48 +9,36 @@ import {
 } from "../components/customHooks";
 import axios from "axios";
 import { useRecoilState } from "recoil";
-import { $Server, $Token } from "@/store";
+import { $Server, $Token, $LoaderIndex } from "@/store";
 import Swal from "sweetalert2";
 export default function AddTask() {
-  const { closeModal, project_id, list_id } = useContext(ProjectsContext);
+  const [, setLoaderIndex] = useRecoilState($LoaderIndex);
+  const { closeModal, project_id, list_id, reloadCertainTaskList } =
+    useContext(ProjectsContext);
   const [durationIndex, setDurationIndex] = useState(false);
   const taskStatus = useProjectStatus();
-  const allTeams = useAllTeams();
   const projectTasklists = useProjectTaskLists(project_id);
+  const [listName, setListName] = useState();
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const task_name = useRef();
   const task_desc = useRef();
-  const task_team_id = useRef();
-  const tasklist_id = useRef();
   const task_status_id = useRef();
   const task_duration = useRef();
-  const task_start_date = useRef();
   const duration_type = useRef();
-  const handleSubmit = () => {
-    event.preventDefault();
-    let taskObj = {
-      task_name: task_name.current.value,
-      task_desc: task_desc.current.value,
-      task_team_id: task_team_id.current.value,
-      tasklist_id: tasklist_id.current.value,
-      task_progress: 0,
-      task_status_id: task_status_id.current.value,
-      task_duration: task_duration.current.value * duration_type.current.value,
-      task_start_date: task_start_date.current.value,
-      task_end_date: getDueDate(
-        task_start_date.current.value,
-        task_duration.current.value * duration_type.current.value
-      ),
-    };
+  const task_start_date = useRef();
+  const allTeams = useAllTeams();
+  const task_team_id = useRef();
+  const tasklist_id = useRef();
 
-    axios
+  const checkNewTaskName = async () => {
+    let Final = 0;
+    await axios
       .post(
-        `${Server_Url}/php/index.php/api/insert`,
+        `${Server_Url}/php/index.php/api/tasks/check`,
         {
-          table_name: "project_tasks",
-          Fields: Object.keys(taskObj),
-          Values: Object.values(taskObj),
+          task_name: task_name.current.value,
+          tasklist_id: list_id,
         },
         {
           headers: {
@@ -59,26 +47,93 @@ export default function AddTask() {
         }
       )
       .then((res) => {
-        // console.log(res.data);
-        Swal.fire({
-          icon: "success",
-          text: "Task Added Successfuly",
-          timer: 1500,
-        });
+        Final = res.data.err ? 1 : 0;
+        console.log(res.data);
       });
+    return Final;
   };
+
+  const handleSubmit = () => {
+    event.preventDefault();
+    let taskObj = {
+      task_name: task_name.current.value,
+      task_desc: task_desc.current.value,
+      tasklist_id: list_id,
+      task_progress: 0,
+      task_status_id: task_status_id.current.value,
+      task_duration: task_duration.current.value * duration_type.current.value,
+    };
+
+    checkNewTaskName().then((res) => {
+      setLoaderIndex(1);
+      res == 0
+        ? axios
+            .post(`${Server_Url}/php/index.php/api/tasks/store`, taskObj, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            })
+            .then((res) => {
+              reloadCertainTaskList(list_id);
+              if (!res.data.err) {
+                setLoaderIndex(0);
+                Swal.fire({
+                  icon: "success",
+                  text: "Task added successfuly",
+                  timer: 1500,
+                });
+                closeModal();
+              }
+            })
+        : Swal.fire({
+            icon: "error",
+            text: "Task name is already exsist !",
+            timer: 1500,
+          }).then(() => {
+            setLoaderIndex(0);
+          });
+    });
+  };
+
+  useEffect(() => {
+    let list = projectTasklists.find((el) => {
+      return el.tasklist_id == list_id;
+    });
+    list ? setListName(list.tasklist_name) : null;
+  }, [projectTasklists]);
+
   return (
-    <div id="addTaskModal" className="Modal" onClick={closeModal}>
+    <div
+      id="addTaskModal"
+      className="Modal"
+      onClick={() => {
+        Swal.fire({
+          icon: "question",
+          text: "Are you sure you want close ?",
+          showConfirmButton: true,
+          showDenyButton: true,
+        })
+          .then((res) => {
+            if (res.isConfirmed) {
+              closeModal();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }}
+    >
       <div
         className="content d-flex flex-wrap align-items-start align-content-start animate__animated animate__fadeInRight"
         onClick={(event) => {
           event.stopPropagation();
         }}
       >
-        <h5 className="header col-12 py-3 px-5">Add New Task</h5>
+        <h5 className="header col-12 p-3">Add New Task</h5>
+        <p className="col-12 text-white px-3 mb-3">To : {listName}</p>
         <form
           onSubmit={handleSubmit}
-          className="col-12 py-5 px-3 gap-3 d-flex flex-wrap"
+          className="col-12 px-3 gap-3 d-flex flex-wrap"
         >
           <div className="col-12 d-flex flex-wrap gap-2">
             <label className="col-12">
@@ -94,9 +149,13 @@ export default function AddTask() {
 
           <div className="col-12 d-flex flex-wrap gap-2">
             <label className="col-12">Task Description</label>
-            <textarea className="col-12 form-control" ref={task_desc} />
+            <textarea
+              className="col-12 form-control"
+              ref={task_desc}
+              required
+            />
           </div>
-
+          {/* 
           <div className="col-12 d-flex flex-wrap gap-2">
             <label className="col-12">Associated Team</label>
             <select
@@ -115,7 +174,7 @@ export default function AddTask() {
                 );
               })}
             </select>
-          </div>
+          </div> */}
 
           <div className="col-12 d-flex flex-wrap gap-2">
             <label className="col-12">Task Status</label>
@@ -137,7 +196,7 @@ export default function AddTask() {
             </select>
           </div>
 
-          <div className="col-12 d-flex flex-wrap gap-2">
+          {/* <div className="col-12 d-flex flex-wrap gap-2">
             <label className="col-12">Tasklist</label>
             <select
               defaultValue={list_id}
@@ -155,9 +214,9 @@ export default function AddTask() {
                 );
               })}
             </select>
-          </div>
+          </div> */}
 
-          <div className="col-12 d-flex flex-wrap gap-2">
+          {/* <div className="col-12 d-flex flex-wrap gap-2">
             <label>
               Start Date <span className="required">*</span>
             </label>
@@ -171,7 +230,8 @@ export default function AddTask() {
                 required
               />
             </div>
-          </div>
+          </div> */}
+
           {durationIndex ? (
             <div className="d-flex flex-wrap gap-2 col-12">
               <div className="col-12 d-flex justify-content-between">
@@ -194,7 +254,7 @@ export default function AddTask() {
             </div>
           ) : (
             <div className="d-flex flex-wrap gap-2 col-12">
-              <div className="col-12 d-flex justify-content-between">
+              {/* <div className="col-12 d-flex justify-content-between">
                 <label>Task Duration</label>
                 <p
                   style={{ color: "rgb(0, 167, 246)" }}
@@ -202,7 +262,7 @@ export default function AddTask() {
                 >
                   Enter End Date
                 </p>
-              </div>
+              </div> */}
               <div className="col-12 d-flex">
                 <input
                   ref={task_duration}
@@ -211,6 +271,7 @@ export default function AddTask() {
                   type="number"
                   min="0"
                   placeholder="Enter Task duration"
+                  required
                 />
                 <select
                   ref={duration_type}
@@ -223,6 +284,7 @@ export default function AddTask() {
               </div>
             </div>
           )}
+
           <button className="btn btn-primary">Add New</button>
         </form>
       </div>

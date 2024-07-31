@@ -15,11 +15,8 @@ import axios from "axios";
 import ProgressBar from "./ProgressBar";
 import { getDueDate, useProjectStatus } from "./customHooks";
 import Swal from "sweetalert2";
-
 export default function Tasklist(props) {
   const tasklist = useRef();
-  // reloadCertainTaskListIndex
-  // reloadCertainTaskList
   const {
     task_id: theTask_id,
     setTask_id,
@@ -36,7 +33,6 @@ export default function Tasklist(props) {
     filter,
   } = useContext(ProjectsContext);
   const Status = useProjectStatus();
-
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const [checked, setChecked] = useState(false);
@@ -44,7 +40,6 @@ export default function Tasklist(props) {
   const [collapseIndex, setCollapseIndex] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [dateIndex, setDateIndex] = useState(null);
-
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
   const [taskIDDesc, setTaskIDDesc] = useState();
@@ -101,7 +96,6 @@ export default function Tasklist(props) {
 
   const handleAddTask = () => {
     openModal(2);
-    setTasklist_id(props.id);
   };
 
   const handleAddTasklist = () => {
@@ -227,15 +221,14 @@ export default function Tasklist(props) {
   };
 
   const handleRightClick = (task_id) => {
-    setTask_id(task_id);
-    // console.log(`Task id : ${task_id}`);
     event.preventDefault();
+    setTasklist_id(props.id);
+    setTask_id(task_id);
     setContextIndex({
       index: true,
       x: event.clientX,
       y: event.clientY,
     });
-    // alert(props.id);
   };
 
   const updateActualTime = async (task_id, oldVal) => {
@@ -423,10 +416,13 @@ export default function Tasklist(props) {
                 <FontAwesomeIcon icon={faComment} />
                 <p>Add Comment</p>
               </div>
-              {/* <div className="col-12 d-flex align-item-center gap-3 p-2">
+              <div
+                className="col-12 d-flex align-item-center gap-3 p-2"
+                onClick={handleAddTask}
+              >
                 <FontAwesomeIcon icon={faPenToSquare} />
-                <p>Rename Task</p>
-              </div> */}
+                <p>Add New Task</p>
+              </div>
               <div
                 className="col-12 d-flex align-item-center gap-3 p-2"
                 onClick={switchDepartment}
@@ -446,8 +442,8 @@ export default function Tasklist(props) {
                   onClick={() => {
                     setCollapseIndex(!collapseIndex);
                     if (collapseIndex == false) {
-                      setTasklist_id(props.id);
                       getTasklistTasks();
+                      setTasklist_id(props.id);
                     }
                   }}
                 >
@@ -493,11 +489,9 @@ export default function Tasklist(props) {
               </tr>
             </tbody>
           </table>
+
           {collapseIndex ? (
-            <table
-              // onContextMenu={(event) => event.stopPropagation()}
-              className="col-12 table table-bordered table-dark mb-0 listTasks animate__animated animate__fadeIn"
-            >
+            <table className="col-12 table table-bordered table-dark mb-0 listTasks animate__animated animate__fadeIn">
               <tbody>
                 {tasks.map((task, index) => {
                   return (
@@ -598,12 +592,7 @@ export default function Tasklist(props) {
                             onChange={updateDate}
                           />
                         ) : (
-                          <p className="m-0 p-0">
-                            {task.task_start_date}
-                            {/* {task.task_start_date.split(" ")[1]} */}
-                            {/* {task.task_start_date.split(" ")[0]} <br />
-                            {task.task_start_date.split(" ")[1]} */}
-                          </p>
+                          <p className="m-0 p-0">{task.task_start_date}</p>
                         )}
                       </td>
                       <td print="false" style={{ width: "15%" }}>
@@ -618,7 +607,6 @@ export default function Tasklist(props) {
                             onContextMenu={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
-                              // event.target.disabled = false;
                               event.target.focus();
                             }}
                             placeholder="Actual"
@@ -692,11 +680,6 @@ export default function Tasklist(props) {
                       </p>
                     </div>
                   </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
                 </tr> */}
               </tbody>
             </table>
