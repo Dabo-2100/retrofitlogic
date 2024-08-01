@@ -17,32 +17,39 @@ import { getDueDate, useProjectStatus } from "./customHooks";
 import Swal from "sweetalert2";
 export default function Tasklist(props) {
   const tasklist = useRef();
+
   const {
-    task_id: theTask_id,
+    filter,
+    list_id,
+    openModal,
+    project_id,
     setTask_id,
+    setTasklist_id,
+    reloadTasklistsIndex,
+    task_id: theTask_id,
     taskListContext: contextIndex,
     setTaskListContext: setContextIndex,
-    project_id,
-    openModal,
-    setTasklist_id,
-    list_id,
-    reloadCertainTaskListIndex: reloadMeIndex,
     reloadCertainTaskList: reloadMe,
-    reloadTasklistsIndex,
-    reloadTasklists,
-    filter,
+    reloadCertainTaskListIndex: reloadMeIndex,
   } = useContext(ProjectsContext);
+
   const Status = useProjectStatus();
   const [Server_Url] = useRecoilState($Server);
   const [token] = useRecoilState($Token);
   const [checked, setChecked] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [editListIndex, setEditListIndex] = useState(false);
   const [collapseIndex, setCollapseIndex] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [dateIndex, setDateIndex] = useState(null);
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [, setLoaderIndex] = useRecoilState($LoaderIndex);
   const [taskIDDesc, setTaskIDDesc] = useState();
+  const [defaultStatus, setDefaultStatus] = useState({
+    status_id: 0,
+    status_color_code: null,
+  });
+
   const getTasklistTasks = () => {
     setSelectedTasks([]);
     // alert(filter.data.status);
@@ -357,6 +364,25 @@ export default function Tasklist(props) {
       });
   };
 
+  const changeTasklistStatus = async () => {
+    let data = { tasklist_status_id: event.target.value };
+    let res = await axios.post(
+      `${Server_Url}/php/index.php/api/update`,
+      {
+        table_name: "project_tasklists",
+        data: data,
+        condition: `tasklist_id = ${props.id}`,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    reloadMe(props.id);
+    setEditIndex(null);
+  };
+
   useEffect(() => {
     if (collapseIndex || filter.data.status != 0) {
       getTasklistTasks();
@@ -368,6 +394,15 @@ export default function Tasklist(props) {
       getTasklistTasks();
     }
   }, [reloadMeIndex]);
+
+  useEffect(() => {
+    let obj = Status.find((el) => {
+      return el.status_name == props.status;
+    });
+    if (obj) {
+      setDefaultStatus(obj);
+    }
+  }, [Status]);
 
   return (
     <>
@@ -435,7 +470,7 @@ export default function Tasklist(props) {
 
           <table className="col-12 table table-bordered table-dark mb-0">
             <tbody>
-              <tr style={{ backgroundColor: "#252628" }}>
+              <tr style={{ backgroundColor: "red" }}>
                 <th
                   print="false"
                   style={{ width: "4%" }}
@@ -484,7 +519,35 @@ export default function Tasklist(props) {
                 </th>
                 {/* <th style={{ width: "10%" }}>{props.status}</th> */}
                 <th style={{ width: "10%" }} print="false">
-                  -
+                  <div
+                    className="col-12"
+                    style={{
+                      backgroundColor: defaultStatus.status_color_code,
+                    }}
+                  >
+                    {editListIndex ? (
+                      <select
+                        className="form-select"
+                        onChange={changeTasklistStatus}
+                        defaultValue={defaultStatus.status_id}
+                      >
+                        {Status.map((el, index) => {
+                          return (
+                            <option key={index} value={el.status_id}>
+                              {el.status_name}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    ) : (
+                      <p
+                        className="py-2"
+                        onDoubleClick={() => setEditListIndex(true)}
+                      >
+                        {defaultStatus.status_name}
+                      </p>
+                    )}
+                  </div>
                 </th>
               </tr>
             </tbody>
