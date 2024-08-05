@@ -26,6 +26,7 @@ export default function Tasklist(props) {
     setTask_id,
     setTasklist_id,
     reloadTasklistsIndex,
+    reloadTasklists,
     task_id: theTask_id,
     taskListContext: contextIndex,
     setTaskListContext: setContextIndex,
@@ -365,22 +366,34 @@ export default function Tasklist(props) {
   };
 
   const changeTasklistStatus = async () => {
-    let data = { tasklist_status_id: event.target.value };
-    let res = await axios.post(
-      `${Server_Url}/php/index.php/api/update`,
-      {
-        table_name: "project_tasklists",
-        data: data,
-        condition: `tasklist_id = ${props.id}`,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    let newStatus = event.target.value;
+    let data = { tasklist_status_id: newStatus };
+    if (newStatus == 4 && props.progress != 100) {
+      Swal.fire({
+        icon: "error",
+        text: "Can't Update Status to done because all tasks not done yet !",
+      }).then(() => {
+        reloadTasklists();
+      });
+    } else {
+      let res = await axios.post(
+        `${Server_Url}/php/index.php/api/update`,
+        {
+          table_name: "project_tasklists",
+          data: data,
+          condition: `tasklist_id = ${props.id}`,
         },
-      }
-    );
-    reloadMe(props.id);
-    setEditIndex(null);
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setEditIndex(null);
+      setEditListIndex(false);
+      // reloadMe(props.id);
+      reloadTasklists();
+    }
   };
 
   useEffect(() => {
@@ -544,7 +557,7 @@ export default function Tasklist(props) {
                         className="py-2"
                         onDoubleClick={() => setEditListIndex(true)}
                       >
-                        {defaultStatus.status_name} 
+                        {defaultStatus.status_name}
                       </p>
                     )}
                   </div>

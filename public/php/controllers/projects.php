@@ -335,7 +335,7 @@ function index_tasks($id)
                         (SELECT COUNT(*) FROM task_comments WHERE task_id = `project_tasks`.`task_id`) AS comment_count 
                         FROM project_tasks 
                         WHERE tasklist_id =:tasklist_id
-                        ORDER BY task_order
+                        ORDER BY level_1,level_2,level_3,task_name
                         ";
                         $statement = $pdo->prepare($sql);
                         $statement->bindParam(':tasklist_id', $tasklist_id);
@@ -801,7 +801,7 @@ function reOrderTasklist($tasklist_id)
 {
     global $pdo;
     if (is_null($tasklist_id) != 1) {
-        $sql = "SELECT task_id,task_name FROM project_tasks WHERE tasklist_id = $tasklist_id ORDER BY level_1,level_2,level_3";
+        $sql = "SELECT task_id,task_name FROM project_tasks WHERE tasklist_id = $tasklist_id ORDER BY level_1,level_2,level_3,task_name";
         $statement0 = $pdo->prepare($sql);
         $statement0->execute();
         if ($statement0->rowCount() > 0) {
