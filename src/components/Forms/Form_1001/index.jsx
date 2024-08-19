@@ -106,6 +106,7 @@ export default function Form_1001() {
   const open1002 = (control_no) => {
     alert(`i will open ${control_no} and i'm Sheet ${+formData.sheet_no}`);
   };
+  
   useEffect(() => {
     getFormControls(+formData.sheet_no);
   }, []);

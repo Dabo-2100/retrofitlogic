@@ -17,7 +17,6 @@ import { Bar } from "react-chartjs-2";
 
 import { Chart as ChartJS2, ArcElement } from "chart.js";
 import { Pie } from "react-chartjs-2";
-import ProgressBar from "@/Apps/Projects/components/ProgressBar";
 import { ReportContext } from "./ReportContext";
 import PartDetails from "./Modals/PartDetails";
 
@@ -112,6 +111,44 @@ export default function ReportsPage() {
     }, {});
   };
 
+  const clearThem = (theArr) => {
+    let times = [];
+    let total = 0;
+    let totalAvionicsWorkinHrs = 0;
+    let totalStructureWorkinHrs = 0;
+    let totalDoneAv = 0;
+    let totalDoneSt = 0;
+    theArr.forEach(el => {
+      let obj = {
+        avionicsIssuedTime: Math.round(el.avionics_duration),
+        structureIssuedTime: Math.round(el.structure_duration),
+        avionicsDoneTime: Math.round(el.done_duration_a),
+        structureDoneTime: Math.round(el.done_duration_s),
+      }
+      totalAvionicsWorkinHrs += obj.avionicsIssuedTime;
+      totalStructureWorkinHrs += obj.structureIssuedTime;
+      totalDoneAv += obj.avionicsDoneTime;
+      totalDoneSt += obj.structureDoneTime;
+      total += obj.avionicsIssuedTime + obj.structureIssuedTime;
+      times.push(obj);
+    });
+
+    console.log(`
+      Current Progress Details on [ 2024-08-06 ]
+      =========================================================
+      Total No of Hrs in aircraft     ==> ${total} Hrs
+      Total No of Hrs for Avionics    ==> ${totalAvionicsWorkinHrs} Hrs [${Math.round(+totalAvionicsWorkinHrs / +total * 100)} %]
+      Total No of Hrs for Structure   ==> ${totalStructureWorkinHrs} Hrs [${Math.round(+totalStructureWorkinHrs / +total * 100)} %]
+      Total Done Work on Aircraft     ==> ${Math.round(((totalDoneAv + totalDoneSt) / total) * 100)} %
+      =========================================================
+      Total Done Avionics percentage  ==> ${Math.round(totalDoneAv * 100 / totalAvionicsWorkinHrs)} % [ ${totalDoneAv} / ${totalAvionicsWorkinHrs} - Hrs]
+      Total Done Structure percentage ==> ${Math.round(totalDoneSt * 100 / totalStructureWorkinHrs)} % [ ${totalDoneSt} / ${totalStructureWorkinHrs} - Hrs]
+      =========================================================
+      Avionics/Aircraft progress      ==> ${Math.round(totalDoneAv * 100 / total)} %
+      Structure/Aircraft progress     ==> ${Math.round(totalDoneSt * 100 / total)} %
+    `)
+  }
+
   const getReportData = async () => {
     await axios
       .get(
@@ -119,6 +156,8 @@ export default function ReportsPage() {
       )
       .then((res) => {
         // console.log(res.data);
+        clearThem(res.data.data);
+
         let da = res.data.data;
         let final = groupBySbNo(da);
         let finalArr = [];
@@ -195,14 +234,17 @@ export default function ReportsPage() {
           ],
         };
         setChart1_data(obj);
-        // console.log(finalArr);
-        setReportData(finalArr);
+        // console.log(totalDuration);
         console.log(finalArr);
+        setReportData(finalArr);
+        // console.log(finalArr);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+
 
   useEffect(() => {
     if (modalIndex !== undefined) {
@@ -278,7 +320,7 @@ export default function ReportsPage() {
                       <td colSpan={2}>
                         {
                           reportData[modalIndex]["row_data"][0][
-                            "issued_duration"
+                          "issued_duration"
                           ]
                         }{" "}
                         Hrs
@@ -289,7 +331,7 @@ export default function ReportsPage() {
                         Actual Work Duration
                       </th>
                       <td colSpan={2}>
-                        {reportData[modalIndex]["total_duration"]} Hrs
+                        {(+reportData[modalIndex]["a_done_duration"] + +reportData[modalIndex]["s_done_duration"]).toFixed()} Hrs
                       </td>
                     </tr>
 
