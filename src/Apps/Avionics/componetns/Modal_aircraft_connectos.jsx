@@ -114,8 +114,8 @@ export default function Modal_aircraft_connectos() {
 
   const handlePrint = () => {
     // console.log(resTable.current.outerHTML);
-    // var newWin = window.open('', 'Print-Window');
-    var newWin = window.open("");
+    var newWin = window.open('', 'Print-Window');
+    // var newWin = window.open("");
     newWin.document.open();
     newWin.document.write("<html><head><title>Print Report</title>");
     newWin.document.write(`

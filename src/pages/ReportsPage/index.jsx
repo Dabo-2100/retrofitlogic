@@ -22,6 +22,7 @@ import PartDetails from "./Modals/PartDetails";
 
 export default function ReportsPage() {
   const { detailsModal, setDetailsModal } = useContext(ReportContext);
+  
   const setRandomColor = () => {
     return (
       "#" +
@@ -96,6 +97,7 @@ export default function ReportsPage() {
   const params = useParams();
   const [reportData, setReportData] = useState([]);
   const [modalIndex, setModalIndex] = useState();
+  const [sn,setSN] = useState(0);
 
   const [chart1_data, setChart1_data] = useState({
     labels: ["jan", "feb"],
@@ -155,11 +157,13 @@ export default function ReportsPage() {
         `${Server_Url}/php/index.php/api/reports/${params.reportNo}/${params.projectID}`
       )
       .then((res) => {
-        // console.log(res.data);
         clearThem(res.data.data);
+        // console.log(res.data);
 
         let da = res.data.data;
         let final = groupBySbNo(da);
+        setSN(da[0].aircraft_sn);
+        console.log(da);
         let finalArr = [];
         for (const key in final) {
           let sb_total_duration = 0;
@@ -243,8 +247,6 @@ export default function ReportsPage() {
         console.log(err);
       });
   };
-
-
 
   useEffect(() => {
     if (modalIndex !== undefined) {
@@ -522,7 +524,7 @@ export default function ReportsPage() {
         ) : null}
 
         <h1 className="col-12 text-center mb-3 fs-4 report-header">
-          Aircraft Progress Report
+          Aircraft Progress Report For : {sn}
         </h1>
         <h5 className="col-12 text-center widget text-white">
           Full Aircraft Percentage : {finalPercentage} %
